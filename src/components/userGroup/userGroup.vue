@@ -132,33 +132,29 @@ export default {
       }
     },
     addUserGroupOk() {
-      if (this.groupName.trim() && this.groupCode.trim()) {
+      if (this.groupName.trim()) {
         var that = this;
         this.axios.get(this.seieiURL + '/usergroup/insert', {
           params: {
-            treeIndex: this.parentData.children.length + 1,
-            pCode: this.parentData.resource.treecode,
-            groupCode: this.groupCode,
-            groupName: this.groupName
+            parentId: this.parentData.resource.id,
+            name: this.groupName
           }
         }).then((response) => {
+          console.log(response.data.status);
           if (response.data.status == 0) {
             that.$Message.success(response.data.msg);
             // 视图修改，依靠的是对象，数组都指向同一个内存地址的特性
             const children = that.parentData.children || [];
             children.push({
-              title: that.groupCode,
+              title: that.groupName,
               expand: true,
               resource: {
-                code: that.groupCode,
-                id: null,
-                name: that.groupCode,
-                pcode: that.parentData.resource.treecode,
-                treecode: response.data.data
+                id: response.data.data,
+                name: that.groupName,
+                parentId: that.parentData.resource.id
               }
             });
             that.$set(that.parentData, 'children', children);
-            that.groupCode = "";
             that.groupName = "";
           } else {
             that.$Message.error(response.data.msg);
@@ -178,14 +174,13 @@ export default {
     },
     addUserGroupCancel() {
       this.isShowAddUserGroup = false;
-      this.groupCode = "";
       this.groupName = "";
     },
     deleteUserGroupOk() {
       const that = this;
       this.axios.get(this.seieiURL + "/usergroup/delete", {
         params: {
-          treeCode: this.deleteNodeData.resource.treecode
+          id: this.deleteNodeData.resource.id
         }
       }).then((response) => {
         if (response.data.status == 0) {

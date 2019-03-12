@@ -41,7 +41,7 @@
                 工作日设置：
               </div>
               <div class="inputWrapper">
-                <CheckboxGroup v-model="weekDay">
+                <CheckboxGroup v-model="workDates">
                   <Checkbox label="1">
                     <span>星期一</span>
                   </Checkbox>
@@ -131,7 +131,6 @@ export default {
           key: 'monday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.monday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -146,7 +145,6 @@ export default {
           key: 'tuesday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.tuesday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -161,7 +159,6 @@ export default {
           key: 'wednesday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.wednesday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -176,7 +173,6 @@ export default {
           key: 'thursday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.thursday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -191,7 +187,6 @@ export default {
           key: 'friday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.friday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -206,7 +201,6 @@ export default {
           key: 'saturday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.saturday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -221,7 +215,6 @@ export default {
           key: 'sunday',
           align: "center",
           render: (h, params) => {
-            const row = params.row;
             const type = params.row.sunday ? "md-checkmark-circle" : "md-radio-button-off";
             return h('Icon', {
               props: {
@@ -270,7 +263,7 @@ export default {
       sumTableData: [], // 主档数据
       isAddMainTable: false, // 是否新增主档数据
       isShowSettingBlock: false, // 是否显示设置模块
-      weekDay: [], // 选择星期工作日
+      workDates: [], // 选择星期工作日
       workDayBtime: "", // 工作日开始时间
       workDayEtime: "", // 工作日结束时间
       nowYear: "", // 年度
@@ -324,7 +317,7 @@ export default {
         }
       ],
       isSubmitloading: false, // 点击提交按钮loading
-      serialno: "", // 工厂日历唯一标识号
+      id: "", // 工厂日历唯一标识号
       inputTableLoading: true, // 节日表 loading
       inputTableData: [], // 修改栏表格数据
       modelTitle: "", // 设置特殊日期对话框题目
@@ -351,13 +344,14 @@ export default {
     reloadMainTable: function() {
       var that = this;
       this.sumTableLoading = true;
-      this.axios.get(this.seieiURL + '/factorycalender/getMainTable').then((response) => {
+      this.axios.get(this.seieiURL + '/workingDateSetting/getMainWorkingDateSetting').then((response) => {
         var list = [];
         response.data.data.forEach((item) => {
           var listItem = {};
-          listItem.year = item.year;
-          listItem.btime = item.begintime;
-          listItem.etime = item.endtime;
+          listItem.year = item.effectiveYear;
+          listItem.btime = item.beginWorkingTime;
+          listItem.etime = item.endWorkingTime;
+          listItem.workDates = [];
           listItem.monday = item.monday;
           listItem.tuesday = item.tuesday;
           listItem.wednesday = item.wednesday;
@@ -365,8 +359,14 @@ export default {
           listItem.friday = item.friday;
           listItem.saturday = item.saturday;
           listItem.sunday = item.sunday;
-          listItem.weekDay = item.weekDay;
-          listItem.serialno = item.serialno;
+          item.monday ? listItem.workDates.push('1') : null;
+          item.tuesday ? listItem.workDates.push('2') : null;
+          item.wednesday ? listItem.workDates.push('3') : null;
+          item.thursday ? listItem.workDates.push('4') : null;
+          item.friday ? listItem.workDates.push('5') : null;
+          item.saturday ? listItem.workDates.push('6') : null;
+          item.sunday ? listItem.workDates.push('7') : null;
+          listItem.id = item.id;
           that.sumTableData.push(listItem);
         });
         that.sumTableLoading = false;
@@ -381,22 +381,22 @@ export default {
     },
     // 点击主档表格
     clickSumTable: function(data, index) {
-      this.weekDay = data.weekDay;
       this.workDayBtime = data.btime;
       this.workDayEtime = data.etime;
+      this.workDates = data.workDates;
       this.nowYear = new Date(data.year + "-01-01");
-      this.serialno = data.serialno;
+      this.id = data.id;
       this.isShowSettingBlock = true;
       this.inputTableLoading = true;
       var that = this;
-      this.axios.get(this.seieiURL + '/factorycalender/getFestivalList?serialno=' + data.serialno).then((response) => {
+      this.axios.get(this.seieiURL + '/workingDateSetting/getFestival?id=' + data.id).then((response) => {
         var list = [];
         response.data.data.forEach((item) => {
           var listItem = {};
-          listItem.festivalName = item.holidaysname;
-          listItem.btime = timeStampToString(new Date(item.begindate));
-          listItem.etime = timeStampToString(new Date(item.enddate));
-          listItem.guid = item.guid;
+          listItem.festivalName = item.festivalName;
+          listItem.btime = timeStampToString(new Date(item.beginDate));
+          listItem.etime = timeStampToString(new Date(item.endDate));
+          listItem.id = item.id;
           that.inputTableData.push(listItem);
         });
         that.inputTableLoading = false;
@@ -412,10 +412,10 @@ export default {
     // 新增工厂日历
     addSumTable: function() {
       var that = this;
-      this.axios.get(this.seieiURL + '/factorycalender/getSerialnoForMainTable').then((response) => {
-        that.serialno = response.data.data;
+      this.axios.get(this.seieiURL + '/factorycalender/getidForMainTable').then((response) => {
+        that.id = response.data.data;
         that.isAddMainTable = true;
-        that.weekDay = [];
+        that.workDates = [];
         that.isShowSettingBlock = true;
         that.inputTableLoading = false;
       })
@@ -453,7 +453,7 @@ export default {
     // 点击移出按钮
     removeFestival: function(index) {
       var that = this;
-      this.axios.get(this.seieiURL + "/factorycalender/deleteFestival?guid=" + this.inputTableData[index].guid).then((response) => {
+      this.axios.get(this.seieiURL + "/factorycalender/deleteFestival?id=" + this.inputTableData[index].id).then((response) => {
         if (response.data.status == 0) {
           that.inputTableData.splice(index, 1);
           that.$Message.success(response.data.msg);
@@ -483,10 +483,10 @@ export default {
           "festivalName": this.inputFestivalName,
           "btime": timeStampToString(this.inputFestivalBtime),
           "etime": timeStampToString(this.inputFestivalEtime),
-          "guid": this.inputTableData[this.modifyIndex].guid
+          "id": this.inputTableData[this.modifyIndex].id
         });
         var args = {};
-        args.guid = this.inputTableData[this.modifyIndex].guid;
+        args.id = this.inputTableData[this.modifyIndex].id;
         args.holidaysname = this.inputFestivalName;
         args.begindate = this.inputFestivalBtime.getTime();
         args.etime = this.inputFestivalEtime.getTime();
@@ -506,28 +506,12 @@ export default {
           });
           console.log(error)
         });
-        // 设置头部
-        // this.axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
-        // this.axios({
-        //     method: 'post',
-        //     url: this.seieiURL + "/factorycalender/updateFestival",
-        //     params: args,
-        //     transformRequest: [function() {
-        //       return JSON.stringify(args)
-        //     }],
-        //   })
-        //   .then((response) => {
-        //     console.log(response);
-        //   })
-        //   .catch((error) => {
-        //     console.log(error);
-        //   })
       }
       // 新增日期
       else if (!this.isModify) {
         var that = this;
         var args = {};
-        args.serialno = this.serialno;
+        args.id = this.id;
         args.holidaysname = this.inputFestivalName;
         args.begindate = this.inputFestivalBtime.getTime();
         args.etime = this.inputFestivalEtime.getTime();
@@ -539,7 +523,7 @@ export default {
               "festivalName": that.inputFestivalName,
               "btime": timeStampToString(that.inputFestivalBtime),
               "etime": timeStampToString(that.inputFestivalEtime),
-              "guid": response.data.data
+              "id": response.data.data
             });
             that.$Message.success(response.data.msg);
           } else {
@@ -573,11 +557,11 @@ export default {
       } else {
         var that = this;
         var args = {};
-        args.serialno = this.serialno;
-        args.year = (new Date(this.nowYear)).getFullYear();
-        args.begintime = this.workDayBtime;
-        args.endtime = this.workDayEtime;
-        if (this.weekDay.length == 0) {
+        args.id = this.id;
+        args.effectiveYear = (new Date(this.nowYear)).getFullYear();
+        args.beginWorkingTime = this.workDayBtime;
+        args.endWorkingTime = this.workDayEtime;
+        if (this.workDates.length == 0) {
           args.monday = false;
           args.tuesday = false;
           args.wednesday = false;
@@ -586,7 +570,7 @@ export default {
           args.saturday = false;
           args.sunday = false;
         } else {
-          this.weekDay.forEach((item) => {
+          this.workDates.forEach((item) => {
             args.monday = (args.monday || item == "1") ? true : false;
             args.tuesday = (args.tuesday || item == "2") ? true : false;
             args.wednesday = (args.wednesday || item == "3") ? true : false;
@@ -598,7 +582,7 @@ export default {
         }
         this.isSubmitloading = true;
         if (!this.isAddMainTable) {
-          this.axios.get(this.seieiURL + "/factorycalender/updateMainTable", {
+          this.axios.get(this.seieiURL + "/workingDateSetting/update", {
             params: args
           }).then((response) => {
             this.isSubmitloading = false;
@@ -649,13 +633,13 @@ export default {
     },
     deleteSumTable: function(data, id) {
       this.isShowDeleteBlock = true;
-      this.serialno = data.serialno;
+      this.id = data.id;
     },
     deleteBlockOk: function() {
       var that = this;
       this.axios.get(this.seieiURL + "/factorycalender/deleteMainTable", {
         params: {
-          serialno: this.serialno
+          id: this.id
         }
       }).then((response) => {
         if (response.data.status == 0) {

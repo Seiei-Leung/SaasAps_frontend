@@ -135,7 +135,7 @@ export default {
             for (var n = 0; n < treeBean.length; n++) {
               var treeBean1 = treeBean[n].children;
               for (var m = 0; m < treeBean1.length; m++) {
-                if (treeBean1[m].serialno == item.lineserialno) {
+                if (treeBean1[m].id == item.productLineId) {
                   resultmainTreeData[i].children[n].children[m].checked = true;
                 }
               }
