@@ -5,7 +5,7 @@
         <div v-show="!isShowSettingBlock">
           <Table height="450" :loading="sumTableLoading" border :columns="sumTableTitle" :data="sumTableData"></Table>
           <div style="margin-top: 30px;text-align:center;">
-            <Button type="primary" @click="addSumTable">新 增 排 产 品 类</Button>
+            <Button type="primary" @click="showAddProductClass">新 增 排 产 品 类</Button>
           </div>
         </div>
       </transition>
@@ -15,43 +15,33 @@
             <Divider class="headerDivider">主 要 信 息</Divider>
             <div class="inputBar">
               <div class="title">
-                产品分类代码：
+                排产品类名称：
               </div>
               <div class="inputWrapper">
-                <Input v-model="inputCno" style="width: 80px"></Input>
+                <Input v-model="inputProductClassName" style="width: 80px" />
               </div>
               <div class="title">
                 款式分类：
               </div>
               <div class="inputWrapper">
-                <Input v-model="inputCname" style="width: 80px"></Input>
+                <Select v-model="inputProperityName" style="margin-left: 7px;width: 100px">
+                  <Option v-for="item in properityNameList" :value="item.name" :key="item.name">{{ item.name }}</Option>
+                </Select>
               </div>
               <div class="title">
                 默认效率：
               </div>
               <div class="inputWrapper">
-                <InputNumber :min="0" :max="1" :step="0.1" v-model="inputEfficiency" style="width: 80px"></InputNumber>
-              </div>
-              <div class="title">
-                前三天效率：
-              </div>
-              <div class="inputWrapper">
-                <InputNumber :min="0" :max="1" :step="0.1" v-model="inputEfficiencystart" style="width: 80px"></InputNumber>
-              </div>
-              <div class="title">
-                裁床sam：
-              </div>
-              <div class="inputWrapper">
-                <InputNumber :min="0" :step="0.1" v-model="inputCuttingsam" style="width: 80px"></InputNumber>
+                <InputNumber :min="0" :step="0.01" v-model="inputDefaultEffiency" style="width: 80px"></InputNumber>
               </div>
             </div>
           </div>
           <div class="bottomBlock">
             <Divider class="headerDivider" style="font-weight:normal;">明 细 记 录</Divider>
             <div>
-              <Table :loading="inputTableLoading" border :columns="inputTableTitle" :data="inputTableData"></Table>
+              <Table :loading="inputTableLoading" border :columns="inputTableTitle" :data="detailData"></Table>
               <div class="addBlock">
-                <Button type="warning" @click="addinputTable" size="small">
+                <Button type="warning" @click="showAddDetail" size="small">
                   新增明细记录
                 </Button>
               </div>
@@ -66,17 +56,31 @@
             </div>
             <div>
               <!-- 修改属性浮层 -->
-              <Modal v-model="isShowSettingPCCategorydl" v-bind:title="settingPCCategorydlTitle" @on-ok="settingPCCategorydlOk" @on-cancel="settingPCCategorydlCancel" ok-text="确认" cancel-text="取消">
-                <div>开始计件数：<InputNumber :min="0" :step="1" v-model="inputSQuantity" style="margin-left: 10px;width: 100px"></InputNumber>
+              <Modal v-model="isShowInputDetail" v-bind:title="settingDetailTitle" @on-ok="modifyDetail" @on-cancel="modifyDetailCancel" ok-text="确认" cancel-text="取消">
+                <div>开始计件数：<InputNumber :min="0" :step="1" v-model="inputStartQuantity" style="margin-left: 10px;width: 100px"></InputNumber>
                 </div>
-                <div style="margin-top:20px;">结束计件数：<InputNumber :min="0" :step="1" v-model="inputEQuantity" style="margin-left: 10px;width: 100px"></InputNumber>
+                <div style="margin-top:20px;">结束计件数：<InputNumber :min="0" :step="1" v-model="inputEndQuantity" style="margin-left: 10px;width: 100px"></InputNumber>
                 </div>
                 <div style="margin-top:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;效率：<InputNumber :min="0" :step="0.01" v-model="inputEfficiency" style="margin-left: 10px;width: 100px"></InputNumber>
                 </div>
               </Modal>
               <!-- 删除排产品类 -->
-              <Modal v-model="isShowDeleteBlock" v-bind:title="deleteBlockTitle" @on-ok="deleteBlockOk" @on-cancel="deleteBlockCancel" ok-text="确认" cancel-text="取消">
+              <Modal v-model="isShowDeleteProductClass" v-bind:title="deleteBlockTitle" @on-ok="deleteProductClass" @on-cancel="deleteBlockCancel" ok-text="确认" cancel-text="取消">
                 <div>{{deleteBlockText}}</div>
+              </Modal>
+              <!-- 新增生产线 -->
+              <Modal v-model="isShowAddProductClass" v-bind:title="addProductClassTitle" @on-ok="addProductClass" @on-cancel="addProductClassCancel" ok-text="确认" cancel-text="取消">
+                <div style="margin-left: 12px;">
+                  排产品类名称：<Input v-model="inputProductClassName" style="margin-left: 10px;width: 100px" />
+                </div>
+                <div style="margin-top:20px;margin-left: 12px;">款式属性：
+                  <Select v-model="inputProperityName" style="margin-left: 31px;width: 100px">
+                    <Option v-for="item in properityNameList" :value="item.name" :key="item.name">{{ item.name }}</Option>
+                  </Select>
+                </div>
+                <div style="margin-top:20px;margin-left: 12px;">默认效率：
+                  <InputNumber :min="0" :step="0.01" v-model="inputDefaultEffiency" style="margin-left: 31px;width: 100px"></InputNumber>
+                </div>
               </Modal>
             </div>
           </div>
@@ -89,31 +93,20 @@
 export default {
   data: function() {
     return {
-      isShowSettingBlock: false,
       sumTableLoading: true,
       sumTableTitle: [{
           title: '产品分类代码',
-          key: 'cno',
+          key: 'name',
           align: "center"
         },
         {
           title: '款式分类',
-          key: 'cname',
+          key: 'productStyleName',
           align: "center"
         },
         {
           title: '默认效率',
           key: 'efficiency',
-          align: "center"
-        },
-        {
-          title: '前三天效率',
-          key: 'efficiencystart',
-          align: "center"
-        },
-        {
-          title: '裁床sam',
-          key: 'cuttingsam',
           align: "center"
         },
         {
@@ -133,7 +126,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.clickSumTable(params.row, params.index)
+                    this.showModifyProductClass(params.row, params.index)
                   }
                 }
               }, '修改'),
@@ -144,7 +137,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.deleteSumTable(params.row, params.index)
+                    this.showDeleteProductClass(params.row, params.index)
                   }
                 }
               }, '删除')
@@ -153,21 +146,16 @@ export default {
         }
       ],
       sumTableData: [],
-      inputCno: "",
-      inputCname: "",
-      inputEfficiency: 0,
-      inputEfficiencystart: 0,
-      inputCuttingsam: 0,
       inputTableLoading: true,
       inputTableTitle: [{
           title: '开始计件数',
-          key: 'squantity',
+          key: 'startQuantity',
           align: "center",
           sortType: "asc"
         },
         {
           title: '结束计件数',
-          key: 'equantity',
+          key: 'endQuantity',
           align: "center"
         },
         {
@@ -192,7 +180,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.changePCCategorydl(params.index)
+                    this.showModifyDetail(params.index)
                   }
                 }
               }, '修改'),
@@ -203,7 +191,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.removePCCategorydl(params.index)
+                    this.deleteDetail(params.index)
                   }
                 }
               }, '删除')
@@ -211,19 +199,29 @@ export default {
           }
         }
       ],
-      inputTableData: [],
-      isShowSettingPCCategorydl: false,
-      settingPCCategorydlTitle: "",
-      inputSQuantity: 0,
-      inputEQuantity: 0,
-      inputEfficiency: 0,
-      isSubmitloading: false,
-      inputIndex: 0,
-      inputGuid: "",
-      isAddMainTable: false,
-      isShowDeleteBlock: false,
+      isShowDeleteProductClass: false,
       deleteBlockText: "是否删除该产品类",
-      deleteBlockTitle: "删除产品类"
+      deleteBlockTitle: "删除产品类",
+      properityNameList: [],
+      isShowAddProductClass: false, // 是否显示产品类输入框
+      inputDefaultEffiency: 0, // 产品类默认效率
+      inputProductClassName: "", // 产品类名称
+      inputProperityName: "", // 产品类属性
+      inputIdOfProductClass: "", // 产品类id
+      isShowSettingBlock: false, // 是否显示详情模块
+      isSubmitloading: false, // 保存设置按钮的 loading 动画
+      isShowInputDetail: false, // 新增或修改详情输入框
+      settingDetailTitle: "", // 新增或修改详情输入框的标题
+      detailData: [], // 详情列表
+      inputStartQuantity: 0, // 开始计件数
+      inputEndQuantity: 0, // 结束计件数
+      inputEfficiency: 0, // 详情效率
+      inputDetailIndex: 0, // 详情的索引
+      inputIdOfDetail: "", // 详情 ID
+
+
+
+
     }
   },
   methods: {
@@ -231,7 +229,7 @@ export default {
     reloadMainTable: function() {
       var that = this;
       this.sumTableLoading = true;
-      this.axios.get(this.seieiURL + '/productionclass/getMainTable').then((response) => {
+      this.axios.get(this.seieiURL + '/productclass/getAllProductClass').then((response) => {
         that.sumTableData = response.data.data;
         that.sumTableLoading = false;
       }).catch((error) => {
@@ -243,140 +241,32 @@ export default {
         console.log(error)
       });
     },
-    clickSumTable: function(data, index) {
-      this.isShowSettingBlock = true;
-      this.inputCno = data.cno;
-      this.inputCname = data.cname;
-      this.inputEfficiencystart = data.efficiencystart;
-      this.inputEfficiency = data.efficiency;
-      this.inputCuttingsam = data.cuttingsam;
-      this.serialno = data.serialno;
-      this.inputTableLoading = true;
-      var that = this;
-      this.axios.get(this.seieiURL + "/productionclass/getSettingTable", {
-        params: {
-          serialno: this.serialno
-        }
-      }).then((response) => {
-        that.inputTableData = response.data.data;
-        that.inputTableLoading = false;
-      }).catch((error) => {
-        that.$Message.error({
-          content: "服务器异常,请刷新！！",
-          duration: 0,
-          closable: true
-        });
-        console.log(error)
-      });
+    // 显示添加产品类输入框
+    showAddProductClass: function() {
+      this.isShowAddProductClass = true;
     },
-    changePCCategorydl: function(index) {
-      this.settingPCCategorydlTitle = "修改明细记录";
-      this.isShowSettingPCCategorydl = true;
-      this.inputEQuantity = this.inputTableData[index].equantity;
-      this.inputSQuantity = this.inputTableData[index].squantity;
-      this.inputEfficiency = this.inputTableData[index].efficiency;
-      this.inputIndex = index;
-      this.inputGuid = this.inputTableData[index].guid;
-    },
-    removePCCategorydl: function(index) {
-      var that = this;
-      this.axios.get(this.seieiURL + '/productionclass/deletePCCategorydl', {
-        params: {
-          guid: this.inputTableData[index].guid
-        }
-      }).then((response) => {
-        if (response.data.status == 0) {
-          that.inputTableData.splice(index, 1);
-          that.$Message.success(response.data.msg);
-        } else {
-          that.$Message.error(response.data.msg);
-        }
-      }).catch((error) => {
-        that.$Message.error({
-          content: "服务器异常,请刷新！！",
-          duration: 0,
-          closable: true
-        });
-        console.log(error)
-      });
-    },
-    settingPCCategorydlOk: function() {
-      var that = this;
-      if (this.inputTableTitle == "修改明细记录") {
-        this.$set(this.inputTableData, [this.inputIndex], {
-          equantity: this.inputEQuantity,
-          squantity: this.inputSQuantity,
-          efficiency: this.inputEfficiency,
-          guid: this.inputGuid
-        });
-        this.axios.get(this.seieiURL + '/productionclass/updatePCCategorydl', {
-          params: {
-            guid: this.inputGuid,
-            equantity: this.inputEQuantity,
-            squantity: this.inputSQuantity,
-            efficiency: this.inputEfficiency
-          }
-        }).then((response) => {
-          if (response.data.status == 0) {
-            that.$Message.success(response.data.msg);
-          } else {
-            that.$Message.error(response.data.msg);
-          }
-        }).catch((error) => {
-          that.$Message.error({
-            content: "服务器异常,请刷新！！",
-            duration: 0,
-            closable: true
-          });
-          console.log(error)
-        });
-      } else {
-        this.axios.get(this.seieiURL + '/productionclass/insertPCCategorydl', {
-          params: {
-            serialno: this.serialno,
-            equantity: this.inputEQuantity,
-            squantity: this.inputSQuantity,
-            efficiency: this.inputEfficiency,
-          }
-        }).then((response) => {
-          if (response.data.status == 0) {
-            that.$set(that.inputTableData, that.inputTableData.length, {
-              equantity: this.inputEQuantity,
-              squantity: this.inputSQuantity,
-              efficiency: this.inputEfficiency,
-              guid: response.data.data
-            });
-            that.$Message.success(response.data.msg);
-          } else {
-            that.$Message.error(response.data.msg);
-          }
-        }).catch((error) => {
-          that.$Message.error({
-            content: "服务器异常,请刷新！！",
-            duration: 0,
-            closable: true
-          });
-          console.log(error)
-        });
+    // 新增产品类
+    addProductClass: function() {
+      var that= this;
+      if (!this.inputProductClassName || !this.inputProperityName) {
+        this.$Message.error("排产品类名称及款式属性不能为空");
+        return;
       }
-    },
-    settingPCCategorydlCancel: function() {
-      this.isShowSettingPCCategorydl = false;
-    },
-    addinputTable: function() {
-      this.settingPCCategorydlTitle = "新增明细记录";
-      this.isShowSettingPCCategorydl = true;
-      this.inputEQuantity = 0;
-      this.inputSQuantity = 0;
-      this.inputEfficiency = 0;
-    },
-    addSumTable: function() {
-      var that = this;
-      this.axios.get(this.seieiURL + '/productionclass/getSerialno').then((response) => {
-        that.isAddMainTable = true;
-        that.isShowSettingBlock = true;
-        that.inputTableLoading = false;
-        that.serialno = response.data.data;
+      this.axios.get(this.seieiURL + "/productclass/insertProductClass", {
+        params: {
+          name: this.inputProductClassName,
+          productStyleName: this.inputProperityName,
+          efficiency: this.inputDefaultEffiency
+        }
+      }).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+        } else {
+          that.isShowAddProductClass = false;
+          that.inputIdOfProductClass = response.data.data;
+          that.isShowSettingBlock = true;
+          that.inputTableLoading = false;
+        }
       }).catch((error) => {
         that.$Message.error({
           content: "服务器异常,请刷新！！",
@@ -386,30 +276,22 @@ export default {
         console.log(error)
       });
     },
+    // 保存设置按钮
     submit: function() {
-      if (!this.inputCno || !this.inputCname) {
+      if (!this.inputProductClassName || !this.inputProperityName) {
         this.$Message.error("产品分类代码及款式分类不能为空");
       } else {
-        var args = {},
-          that = this,
-          url;
-        args.cname = this.inputCname;
-        args.cno = this.inputCno;
-        args.efficiencystart = this.inputEfficiencystart;
-        args.efficiency = this.inputEfficiency;
-        args.cuttingsam = this.inputCuttingsam;
-        args.serialno = this.serialno;
+        var that = this;
         this.isSubmitloading = true;
-        if (!this.isAddMainTable) {
-          url = this.seieiURL + "/productionclass/updatePCCategory"
-        } else {
-          url = this.seieiURL + "/productionclass/insertPCCategory"
-        }
-        this.axios.get(url, {
-          params: args
+        this.axios.get(this.seieiURL + "/productclass/updateProductClass", {
+          params: {
+            id: this.inputIdOfProductClass,
+            name: this.inputProductClassName,
+            productStyleName: this.inputProperityName,
+            efficiency: this.inputDefaultEffiency
+          }
         }).then((response) => {
           if (response.data.status == 0) {
-            that.isAddMainTable = false;
             that.isSubmitloading = false;
             that.$Message.success(response.data.msg);
           } else {
@@ -425,26 +307,167 @@ export default {
         });
       }
     },
+    // 显示修改详情输入框
+    showModifyDetail: function(index) {
+      this.settingDetailTitle = "修改明细记录";
+      this.isShowInputDetail = true;
+      this.inputEndQuantity = this.detailData[index].endQuantity;
+      this.inputStartQuantity = this.detailData[index].startQuantity;
+      this.inputEfficiency = this.detailData[index].efficiency;
+      this.inputDetailIndex = index;
+      this.inputIdOfDetail = this.detailData[index].id;
+    },
+    // 显示新增详情按钮
+    showAddDetail: function() {
+      this.settingDetailTitle = "新增明细记录";
+      this.isShowInputDetail = true;
+      this.inputEndQuantity = 0;
+      this.inputStartQuantity = 0;
+      this.inputEfficiency = 0;
+    },
+    // 修改或新增详情确定按钮
+    modifyDetail: function() {
+      var that = this;
+      if ((this.inputEfficiency + "") == "" || (this.inputEndQuantity + "") == "" || (this.inputStartQuantity + "") == "") {
+        this.$Message.error("输入不能为空");
+        return;
+      }
+      if (this.inputEndQuantity <= this.inputStartQuantity) {
+        this.$Message.error("开始计件数不能高于或等于结束计件数");
+        return;
+      }
+      if (this.settingDetailTitle == "修改明细记录") {
+        this.axios.get(this.seieiURL + '/productclass/updateDetail', {
+          params: {
+            id: this.inputIdOfDetail,
+            endQuantity: this.inputEndQuantity,
+            startQuantity: this.inputStartQuantity,
+            efficiency: this.inputEfficiency
+          }
+        }).then((response) => {
+          if (response.data.status == 0) {
+            that.$set(that.detailData, [that.inputDetailIndex], {
+              endQuantity: that.inputEndQuantity,
+              startQuantity: that.inputStartQuantity,
+              efficiency: that.inputEfficiency,
+              id: that.inputIdOfDetail
+            });
+            that.$Message.success(response.data.msg);
+          } else {
+            that.$Message.error(response.data.msg);
+          }
+        }).catch((error) => {
+          that.$Message.error({
+            content: "服务器异常,请刷新！！",
+            duration: 0,
+            closable: true
+          });
+          console.log(error)
+        });
+      } else {
+        this.axios.get(this.seieiURL + '/productclass/insertDetail', {
+          params: {
+            productClassId: this.inputIdOfProductClass,
+            endQuantity: this.inputEndQuantity,
+            startQuantity: this.inputStartQuantity,
+            efficiency: this.inputEfficiency,
+          }
+        }).then((response) => {
+          if (response.data.status == 0) {
+            that.$set(that.detailData, that.detailData.length, {
+              endQuantity: that.inputEndQuantity,
+              startQuantity: that.inputStartQuantity,
+              efficiency: that.inputEfficiency,
+              id: response.data.data
+            });
+            that.$Message.success(response.data.msg);
+          } else {
+            that.$Message.error(response.data.msg);
+          }
+        }).catch((error) => {
+          that.$Message.error({
+            content: "服务器异常,请刷新！！",
+            duration: 0,
+            closable: true
+          });
+          console.log(error)
+        });
+      }
+    },
+    // 修改或新增详情取消按钮
+    modifyDetailCancel: function() {
+      this.isShowInputDetail = false;
+    },
+    // 删除详情
+    deleteDetail: function(index) {
+      var that = this;
+      this.axios.get(this.seieiURL + '/productclass/deleteDetail', {
+        params: {
+          id: this.detailData[index].id
+        }
+      }).then((response) => {
+        if (response.data.status == 0) {
+          that.detailData.splice(index, 1);
+          that.$Message.success(response.data.msg);
+        } else {
+          that.$Message.error(response.data.msg);
+        }
+      }).catch((error) => {
+        that.$Message.error({
+          content: "服务器异常,请刷新！！",
+          duration: 0,
+          closable: true
+        });
+        console.log(error)
+      });
+    },
+    // 显示修改产品类输入框
+    showModifyProductClass: function(data, index) {
+      this.isShowSettingBlock = true;
+      this.inputProductClassName = data.name;
+      this.inputProperityName = data.productStyleName;
+      this.inputDefaultEffiency = data.efficiency;
+      this.inputIdOfProductClass = data.id;
+      this.inputTableLoading = true;
+      var that = this;
+      this.axios.get(this.seieiURL + "/productclass/getDetailById", {
+        params: {
+          productClassId: this.inputIdOfProductClass
+        }
+      }).then((response) => {
+        that.detailData = response.data.data;
+        that.inputTableLoading = false;
+      }).catch((error) => {
+        that.$Message.error({
+          content: "服务器异常,请刷新！！",
+          duration: 0,
+          closable: true
+        });
+        console.log(error)
+      });
+    },
+    // 退出按钮
     getOut: function() {
       this.isShowSettingBlock = false;
-      this.isAddMainTable = false;
       this.reloadMainTable();
-      this.inputTableData = [];
-      this.inputCno = "";
-      this.inputCname = "";
+      this.detailData = [];
+      this.inputProductClassName = "";
+      this.inputProperityName = "";
       this.inputEfficiency = 0;
       this.inputEfficiencystart = 0;
-      this.inputCuttingsam = 0;
+      this.inputDefaultEffiency = 0;
     },
-    deleteSumTable: function(data, id) {
-      this.isShowDeleteBlock = true;
-      this.serialno = data.serialno;
+    // 显示删除产品类窗口
+    showDeleteProductClass: function(data, id) {
+      this.isShowDeleteProductClass = true;
+      this.inputIdOfProductClass = data.id;
     },
-    deleteBlockOk: function() {
+    // 删除产品类
+    deleteProductClass: function() {
       var that = this;
-      this.axios.get(this.seieiURL + "/productionclass/deleteMainTable", {
+      this.axios.get(this.seieiURL + "/productclass/deleteProductClass", {
         params: {
-          serialno: this.serialno
+          id: this.inputIdOfProductClass
         }
       }).then((response) => {
         if (response.data.status == 0) {
@@ -463,10 +486,21 @@ export default {
       });
     },
     deleteBlockCancel: function() {
-
+      this.isShowDeleteProductClass = false;
     }
   },
   created: function() {
+    var that = this;
+    this.axios.get(this.seieiURL + "/productstyle/getall").then((response) => {
+      that.properityNameList = response.data.data;
+    }).catch((error) => {
+      that.$Message.error({
+        content: "服务器异常,请刷新！！",
+        duration: 0,
+        closable: true
+      });
+      console.log(error)
+    });
     // 页面初始化设置高度
     this.$nextTick(() => {
       this.$refs["rightBlockTabpaneWrapper"].style.height = this.windowHeight - 40 - 49 + "px"

@@ -6,18 +6,18 @@
           <div class="filterBar" style="margin-bottom: 10px;">
             <div class="title titleFirst">筛选组别：</div>
             <div class="inputWrapper">
-              <Input v-model="filterGroup" style="width: 50px" @on-change="filterSumTableData"></Input>
+              <Input v-model="filterGroup" style="width: 50px" @on-change="filterSumTableData" />
             </div>
             <div class="title">筛选车间：</div>
             <div class="inputWrapper">
-              <Input v-model="filterWorkShop" style="width: 50px" @on-change="filterSumTableData"></Input>
+              <Input v-model="filterWorkShop" style="width: 50px" @on-change="filterSumTableData" />
             </div>
             <div class="title">筛选生产线：</div>
             <div class="inputWrapper">
-              <Input v-model="filterProductionLine" style="width: 50px" @on-change="filterSumTableData"></Input>
+              <Input v-model="filterProductionLine" style="width: 50px" @on-change="filterSumTableData" />
             </div>
           </div>
-          <Table height="450" :loading="sumTableLoading" border :columns="sumTableTitle" :data="sumTableDataForShow" @on-row-dblclick="clickSumTable"></Table>
+          <Table height="450" :loading="sumTableLoading" border :columns="sumTableTitle" :data="sumTableDataForShow"></Table>
           <div style="margin-top: 30px;text-align:center;">
             <Button type="primary" @click="addSumTable">新 增 生 产 设 置</Button>
           </div>
@@ -32,19 +32,31 @@
                 组别：
               </div>
               <div class="inputWrapper">
-                <Input v-model="inputWorkGroup" style="width: 100px"></Input>
+                <Input v-model="inputWorkGroup" style="width: 100px" />
               </div>
               <div class="title">
                 车间：
               </div>
               <div class="inputWrapper">
-                <Input v-model="inputWorkShop" style="width: 100px"></Input>
+                <Input v-model="inputWorkShop" style="width: 100px" />
               </div>
               <div class="title">
                 生产线：
               </div>
               <div class="inputWrapper">
-                <Input v-model="inputLineCode" style="width: 100px"></Input>
+                <Input v-model="inputLineCode" style="width: 100px" />
+              </div>
+              <div class="title">
+                默认人数：
+              </div>
+              <div class="inputWrapper">
+                <InputNumber :min="0" :step="1" v-model="inputPeopleNum" style="margin-left: 10px;width: 100px"></InputNumber>
+              </div>
+              <div class="title">
+                默认工时：
+              </div>
+              <div class="inputWrapper">
+                <InputNumber :min="0" :step="0.1" v-model="inputWorkHours" style="width: 100px"></InputNumber>
               </div>
             </div>
           </div>
@@ -93,7 +105,7 @@
                   <Option v-for="item in properityNameList" :value="item.name" :key="item.name">{{ item.name }}</Option>
                 </Select>
               </div>
-              <div style="margin-top:20px;">效率：<InputNumber :min="0" :max="1" :step="0.1" v-model="inputProperityEfficiency" style="margin-left: 10px;width: 100px"></InputNumber>
+              <div style="margin-top:20px;">效率：<InputNumber :min="0" :max="1" :step="0.01" v-model="inputProperityEfficiency" style="margin-left: 10px;width: 100px"></InputNumber>
               </div>
             </Modal>
             <!-- 修改工时浮层 -->
@@ -116,11 +128,15 @@
             </Modal>
             <!-- 新增生产线 -->
             <Modal v-model="isShowAddProductionLine" v-bind:title="addProductionLineTitle" @on-ok="addProductionLine" @on-cancel="addProductionLineCancel" ok-text="确认" cancel-text="取消">
-              <div style="margin-left: 12px;">组别：<Input v-model="inputWorkGroup" style="margin-left: 10px;width: 100px">
+              <div style="margin-left: 12px;">组别：<Input v-model="inputWorkGroup" style="margin-left: 10px;width: 100px" />
               </div>
-              <div style="margin-top:20px;margin-left: 12px;">车间：<Input v-model="inputWorkShop" style="margin-left: 10px;width: 100px"></DatePicker>
+              <div style="margin-top:20px;margin-left: 12px;">车间：<Input v-model="inputWorkShop" style="margin-left: 10px;width: 100px" />
               </div>
-              <div style="margin-top:20px;">生产线：<Input v-model="inputLineCode" style="margin-left: 10px;width: 100px"></DatePicker>
+              <div style="margin-top:20px;">生产线：<Input v-model="inputLineCode" style="margin-left: 10px;width: 100px" />
+              </div>
+              <div style="margin-top:20px;margin-left: 12px;">人数：<InputNumber :min="0" :step="1" v-model="inputPeopleNum" style="margin-left: 10px;width: 100px"></InputNumber>
+              </div>
+              <div style="margin-top:20px;margin-left: 12px;">工时：<InputNumber :min="0" :step="0.1" v-model="inputWorkHours" style="margin-left: 10px;width: 100px"></InputNumber>
               </div>
             </Modal>
           </div>
@@ -159,6 +175,41 @@ export default {
           title: '工时',
           key: 'workhours',
           align: "center"
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.clickSumTable(params.index)
+                  }
+                }
+              }, '修改'),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.removeProductLine(params.index)
+                  }
+                }
+              }, '删除')
+            ]);
+          }
         }
       ],
       sumTableDataForShow: [], // 主档表格显示数据
@@ -168,8 +219,11 @@ export default {
       filterProductionLine: "", // 主档筛选生产线
       inputProductionLineId: "", // 激活主档生产线 Id
       inputWorkGroup: "", // 主档输入组别
-      inputWorkShop: "", // 主档输入组别
-      inputLineCode: "", // 主档输入组别
+      inputWorkShop: "", // 主档输入车间
+      inputLineCode: "", // 主档输入生产线
+      inputWorkHours: 0, // 主档输入工时
+      inputPeopleNum: 0, // 主档输入人数
+
       // 属性效率表头
       attributeTableTitle: [{
           title: "属性",
@@ -387,44 +441,35 @@ export default {
     filterSumTableData: function() {
       // 复制数组
       this.sumTableDataForShow = this.sumTableDataForResource.slice(0, this.sumTableDataForResource.length);
-      // 修改开始时间
-      if (this.filterBtime) {
-        this.sumTableDataForShow = this.sumTableDataForShow.filter((item) => {
-          return (item.btime > this.filterBtime.getTime());
-        });
-      }
-      // 修改结束时间
-      if (this.filterEtime) {
-        this.sumTableDataForShow = this.sumTableDataForShow.filter((item) => {
-          return (item.etime < this.filterEtime.getTime());
-        });
-      }
       // 修改组别
       if (this.filterGroup) {
         this.sumTableDataForShow = this.sumTableDataForShow.filter((item) => {
-          return (item.group == this.filterGroup);
+          return (item.workgroup == this.filterGroup);
         });
       }
       // 修改生产车间
       if (this.filterWorkShop) {
         this.sumTableDataForShow = this.sumTableDataForShow.filter((item) => {
-          return (item.workShop == this.filterWorkShop);
+          return (item.workshop == this.filterWorkShop);
         });
       }
       // 修改生产线
       if (this.filterProductionLine) {
         this.sumTableDataForShow = this.sumTableDataForShow.filter((item) => {
-          return (item.productionLine == this.filterProductionLine);
+          return (item.lineCode == this.filterProductionLine);
         });
       }
     },
     // 点击主档表格
-    clickSumTable: function(data, index) {
+    clickSumTable: function(index) {
+      var data = this.sumTableDataForShow[index];
       this.isShowSettingBlock = true;
       this.inputWorkGroup = data.workgroup;
       this.inputWorkShop = data.workshop;
       this.inputLineCode = data.lineCode;
       this.inputProductionLineId = data.id;
+      this.inputPeopleNum = data.peopleNum;
+      this.inputWorkHours = data.workhours;
       this.inputTableLoading = true;
       var that = this;
       this.axios.get(this.seieiURL + "/productionline/getdetailbylineid", {
@@ -444,7 +489,38 @@ export default {
         });
         that.peopleNumTableData = response.data.data.peopleNumOfLineList;
         that.inputTableLoading = false;
-      })
+      }).catch((error) => {
+        that.$Message.error({
+          content: "服务器异常,请刷新！！",
+          duration: 0,
+          closable: true
+        });
+        console.log(error)
+      });
+    },
+    // 删除主档信息
+    removeProductLine: function(index) {
+      var that = this;
+      this.axios.get(this.seieiURL + "/productionline/delete", {
+        params: {
+          id: this.inputProductionLineId
+        }
+      }).then((response) => {
+        if (response.data.status == 0) {
+          that.$Message.success(response.data.msg);
+          that.reloadMainTable();
+          that.filterSumTableData();
+        } else {
+          that.$Message.error(response.data.msg);
+        }
+      }).catch((error) => {
+        that.$Message.error({
+          content: "服务器异常,请刷新！！",
+          duration: 0,
+          closable: true
+        });
+        console.log(error)
+      });
     },
     // 点击新增主档信息按钮
     addSumTable: function() {
@@ -452,6 +528,8 @@ export default {
       this.inputWorkGroup = "";
       this.inputWorkShop = "";
       this.inputLineCode = "";
+      this.inputWorkHours = 0;
+      this.inputPeopleNum = 0;
     },
     // 点击属性从表中的修改按钮
     changeAttributeTable: function(index) {
@@ -609,6 +687,10 @@ export default {
     // 点击工时浮动层的确定按钮
     settingWorkTimeOk: function() {
       var that = this;
+      if (that.settingWorkTimeBtime.getTime() > that.settingWorkTimeEtime.getTime()) {
+        that.$Message.error("起始时间不能比结束时间后");
+        return;
+      }
       if (this.settingWorkTimeTitle == "修改工时") {
         this.axios.get(this.seieiURL + '/productionline/updateWorkhours', {
           params: {
@@ -715,6 +797,10 @@ export default {
     // 点击人数浮动层的确认按钮
     settingPeopleNumOk: function() {
       var that = this;
+      if (that.settingPeopleNumBtime.getTime() > that.settingPeopleNumEtime.getTime()) {
+        that.$Message.error("起始时间不能比结束时间后");
+        return;
+      }
       if (this.settingPeopleNumTitle == "修改人数") {
         this.axios.get(this.seieiURL + '/productionline/updatePeopleNum', {
           params: {
@@ -798,7 +884,9 @@ export default {
             id: this.inputProductionLineId,
             workgroup: this.inputWorkGroup,
             workshop: this.inputWorkShop,
-            lineCode: this.inputLineCode
+            lineCode: this.inputLineCode,
+            workhours: this.inputWorkHours,
+            peopleNum: this.inputPeopleNum
           }
         }).then((response) => {
           if (response.data.status == 0) {
@@ -837,7 +925,9 @@ export default {
         params: {
           workgroup: this.inputWorkGroup,
           workshop: this.inputWorkShop,
-          lineCode: this.inputLineCode
+          lineCode: this.inputLineCode,
+          peopleNum: this.inputPeopleNum,
+          workhours: this.inputWorkHours
         }
       }).then((response) => {
         if (response.data.status == 0) {

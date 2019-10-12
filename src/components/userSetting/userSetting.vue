@@ -27,13 +27,13 @@
               &nbsp;用户账号：
             </div>
             <div class="inputWrapper">
-              <Input v-model="inputCode" style="width: 100px"></Input>
+              <Input v-model="inputCode" style="width: 100px" />
             </div>
             <div class="title">
               用户名称：
             </div>
             <div class="inputWrapper">
-              <Input v-model="inputName" style="width: 100px"></Input>
+              <Input v-model="inputName" style="width: 100px" />
             </div>
           </div>
           <div class="inputBar">
@@ -41,13 +41,13 @@
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;邮箱：
             </div>
             <div class="inputWrapper">
-              <Input v-model="inputEmail" style="width: 100px"></Input>
+              <Input v-model="inputEmail" style="width: 100px" />
             </div>
             <div class="title">
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手机：
             </div>
             <div class="inputWrapper">
-              <Input v-model="inputPhoneNum" style="width: 100px"></Input>
+              <Input v-model="inputPhoneNum" style="width: 100px" />
             </div>
           </div>
           <div class="inputBar">
@@ -55,13 +55,13 @@
               管理级别：
             </div>
             <div class="inputWrapper">
-              <Input v-model="inputRole" style="width: 100px"></Input>
+              <Input v-model="inputRole" style="width: 100px" />
             </div>
             <div class="title">
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;密码：
             </div>
             <div class="inputWrapper">
-              <Input v-model="inputPassWord" style="width: 100px"></Input>
+              <Input v-model="inputPassWord" style="width: 100px" />
             </div>
           </div>
         </div>
@@ -309,7 +309,7 @@ export default {
       var that = this;
       this.axios.get(this.seieiURL + "/user/delete", {
         params: {
-          id: this.inputID
+          userid: this.inputID
         }
       }).then((response) => {
         if (response.data.status == 0) {

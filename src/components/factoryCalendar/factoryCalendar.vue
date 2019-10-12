@@ -5,7 +5,7 @@
         <div v-show="!isShowSettingBlock">
           <Table height="450" :loading="sumTableLoading" border :columns="sumTableTitle" :data="sumTableData"></Table>
           <div style="margin-top: 30px;text-align:center;">
-            <Button type="primary" @click="addSumTable">新 增 工 作 日 历</Button>
+            <Button type="primary" @click="showAddFactoryCalendar">新 增 工 作 日 历</Button>
           </div>
         </div>
       </transition>
@@ -19,21 +19,6 @@
               </div>
               <div class="inputWrapper">
                 <DatePicker type="year" @on-change="changeYear" :value="nowYear" placeholder="选择年份" style="width: 200px" :clearable="false"></DatePicker>
-              </div>
-            </div>
-            <div class="inputBar">
-              <div class="title">每日工作时间：</div>
-              <div class="title">
-                开始时间
-              </div>
-              <div class="inputWrapper">
-                <TimePicker type="time" @on-change="changeworkDayBtime" :value="workDayBtime" placeholder="选择时间" style="width: 200px" :clearable="false" format="HH:mm"></TimePicker>
-              </div>
-              <div class="title" style="margin-left: 20px;">
-                结束时间
-              </div>
-              <div class="inputWrapper">
-                <TimePicker type="time" @on-change="changeworkDayEtime" :value="workDayEtime" placeholder="选择时间" style="width: 200px" :clearable="false" format="HH:mm"></TimePicker>
               </div>
             </div>
             <div class="inputBar">
@@ -98,6 +83,42 @@
             <Modal v-model="isShowDeleteBlock" v-bind:title="deleteBlockTitle" @on-ok="deleteBlockOk" @on-cancel="deleteBlockCancel" ok-text="确认" cancel-text="取消">
               <div>{{deleteBlockText}}</div>
             </Modal>
+            <!-- 新建日历 -->
+            <Modal v-model="isShowAddFactoryCalendar" v-bind:title="addFactoryCalendarTitle" @on-ok="addFactoryCalendar" @on-cancel="addFactoryCalendarCancel" ok-text="确认" cancel-text="取消">
+              <div>年度：
+                <DatePicker type="year" @on-change="changeYear" :value="nowYear" placeholder="选择年份" style="width: 200px;margin-left: 15px;" :clearable="false"></DatePicker>
+              </div>
+              <div class="inputBar" style="margin-top: 15px;line-height: 2em;">
+                <div class="title">
+                  工作日设置：
+                </div>
+                <div class="inputWrapper" style="margin-top: 5px;">
+                  <CheckboxGroup v-model="workDates">
+                    <Checkbox label="1">
+                      <span>星期一</span>
+                    </Checkbox>
+                    <Checkbox label="2">
+                      <span>星期二</span>
+                    </Checkbox>
+                    <Checkbox label="3">
+                      <span>星期三</span>
+                    </Checkbox>
+                    <Checkbox label="4">
+                      <span>星期四</span>
+                    </Checkbox>
+                    <Checkbox label="5">
+                      <span>星期五</span>
+                    </Checkbox>
+                    <Checkbox label="6">
+                      <span>星期六</span>
+                    </Checkbox>
+                    <Checkbox label="7">
+                      <span>星期日</span>
+                    </Checkbox>
+                  </CheckboxGroup>
+                </div>
+              </div>
+            </Modal>
           </div>
         </div>
       </transition>
@@ -115,16 +136,6 @@ export default {
           key: 'year',
           align: "center",
           sortType: "desc"
-        },
-        {
-          title: '开始时间',
-          key: 'btime',
-          align: "center"
-        },
-        {
-          title: '结束时间',
-          key: 'etime',
-          align: "center"
         },
         {
           title: '星期一',
@@ -241,7 +252,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.clickSumTable(params.row, params.index)
+                    this.showSettingBlock(params.row, params.index)
                   }
                 }
               }, '修改'),
@@ -264,8 +275,6 @@ export default {
       isAddMainTable: false, // 是否新增主档数据
       isShowSettingBlock: false, // 是否显示设置模块
       workDates: [], // 选择星期工作日
-      workDayBtime: "", // 工作日开始时间
-      workDayEtime: "", // 工作日结束时间
       nowYear: "", // 年度
       // 修改栏表格标题
       inputTableTitle: [{
@@ -329,7 +338,10 @@ export default {
       inputFestivalEtime: "", // 设置特殊日期的结束日期
       isShowDeleteBlock: false,
       deleteBlockText: "是否删除该工作日历",
-      deleteBlockTitle: "删除工作日历"
+      deleteBlockTitle: "删除工作日历",
+      isShowAddFactoryCalendar: false,
+      addFactoryCalendarTitle: "新增工作日历",
+
     }
   },
   created: function() {
@@ -344,7 +356,7 @@ export default {
     reloadMainTable: function() {
       var that = this;
       this.sumTableLoading = true;
-      this.axios.get(this.seieiURL + '/workingDateSetting/getMainWorkingDateSetting').then((response) => {
+      this.axios.get(this.seieiURL + '/factoryCalendar/getFactoryCalendarList').then((response) => {
         var list = [];
         response.data.data.forEach((item) => {
           var listItem = {};
@@ -367,8 +379,9 @@ export default {
           item.saturday ? listItem.workDates.push('6') : null;
           item.sunday ? listItem.workDates.push('7') : null;
           listItem.id = item.id;
-          that.sumTableData.push(listItem);
+          list.push(listItem);
         });
+        that.sumTableData = list;
         that.sumTableLoading = false;
       }).catch((error) => {
         that.$Message.error({
@@ -379,17 +392,70 @@ export default {
         console.log(error)
       });
     },
+    // 显示添加工厂日历
+    showAddFactoryCalendar: function() {
+      this.isShowAddFactoryCalendar = true;
+      this.workDates = []; // 选择星期工作日
+      this.nowYear = ""; // 年度
+    },
+    // 添加工厂日历
+    addFactoryCalendar: function() {
+      if (!this.nowYear) {
+        this.$Message.error("年度不能为空");
+        return;
+      }
+      var that = this;
+      var args = {};
+      args.effectiveYear = (new Date(this.nowYear)).getFullYear();
+      if (this.workDates.length == 0) {
+        args.monday = false;
+        args.tuesday = false;
+        args.wednesday = false;
+        args.thursday = false;
+        args.friday = false;
+        args.saturday = false;
+        args.sunday = false;
+      } else {
+        this.workDates.forEach((item) => {
+          args.monday = (args.monday || item == "1") ? true : false;
+          args.tuesday = (args.tuesday || item == "2") ? true : false;
+          args.wednesday = (args.wednesday || item == "3") ? true : false;
+          args.thursday = (args.thursday || item == "4") ? true : false;
+          args.friday = (args.friday || item == "5") ? true : false;
+          args.saturday = (args.saturday || item == "6") ? true : false;
+          args.sunday = (args.sunday || item == "7") ? true : false;
+        });
+      }
+      this.axios.get(this.seieiURL + "/factoryCalendar/addFactoryCalendar", {
+        params: args
+      }).then((response) => {
+        console.log(response)
+        if (response.data.status == 0) {
+          that.$Message.success(response.data.msg);
+          that.isShowSettingBlock = true;
+          that.inputTableLoading = false;
+          that.idOfFactoryCalendar = response.data.data;
+        } else {
+          that.$Message.error(response.data.msg);
+        }
+      }).catch((error) => {
+        that.$Message.error({
+          content: "服务器异常,请刷新！！",
+          duration: 0,
+          closable: true
+        });
+        console.log(error)
+      });
+    },
     // 点击主档表格
-    clickSumTable: function(data, index) {
-      this.workDayBtime = data.btime;
-      this.workDayEtime = data.etime;
+    showSettingBlock: function(data, index) {
       this.workDates = data.workDates;
       this.nowYear = new Date(data.year + "-01-01");
-      this.id = data.id;
+      this.idOfFactoryCalendar = data.id;
       this.isShowSettingBlock = true;
       this.inputTableLoading = true;
       var that = this;
-      this.axios.get(this.seieiURL + '/workingDateSetting/getFestival?id=' + data.id).then((response) => {
+      this.axios.get(this.seieiURL + '/factoryCalendar/getFestival?id=' + data.id).then((response) => {
         var list = [];
         response.data.data.forEach((item) => {
           var listItem = {};
@@ -409,28 +475,9 @@ export default {
         console.log(error)
       });
     },
-    // 新增工厂日历
-    addSumTable: function() {
-      var that = this;
-      this.axios.get(this.seieiURL + '/factorycalender/getidForMainTable').then((response) => {
-        that.id = response.data.data;
-        that.isAddMainTable = true;
-        that.workDates = [];
-        that.isShowSettingBlock = true;
-        that.inputTableLoading = false;
-      })
-    },
     // 修改年度
     changeYear: function(date) {
       this.nowYear = new Date(date);
-    },
-    // 修改工作开始时间
-    changeworkDayBtime: function(date) {
-      this.workDayBtime = date
-    },
-    // 修改工作结束时间
-    changeworkDayEtime: function(date) {
-      this.workDayEtime = date
     },
     // 修改节日开始日期
     changeInputFestivalBtime: function(date) {
@@ -453,14 +500,13 @@ export default {
     // 点击移出按钮
     removeFestival: function(index) {
       var that = this;
-      this.axios.get(this.seieiURL + "/factorycalender/deleteFestival?id=" + this.inputTableData[index].id).then((response) => {
+      this.axios.get(this.seieiURL + "/factoryCalendar/deleteFestival?id=" + this.inputTableData[index].id).then((response) => {
         if (response.data.status == 0) {
           that.inputTableData.splice(index, 1);
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
         }
-
       }).catch((error) => {
         that.$Message.error({
           content: "服务器异常,请刷新！！",
@@ -474,9 +520,10 @@ export default {
     settingFestivalOk: function() {
       if (!this.inputFestivalName) {
         this.$Message.error("节日名不能为空");
+        return;
       }
       // 修改日期
-      else if (this.isModify) {
+      if (this.isModify) {
         var that = this;
         this.isModify = false;
         this.$set(this.inputTableData, [this.modifyIndex], {
@@ -487,10 +534,10 @@ export default {
         });
         var args = {};
         args.id = this.inputTableData[this.modifyIndex].id;
-        args.holidaysname = this.inputFestivalName;
-        args.begindate = this.inputFestivalBtime.getTime();
-        args.etime = this.inputFestivalEtime.getTime();
-        this.axios.get(this.seieiURL + "/factorycalender/updateFestival", {
+        args.festivalName = this.inputFestivalName;
+        args.beginDate = this.inputFestivalBtime.getTime();
+        args.endDate = this.inputFestivalEtime.getTime();
+        this.axios.get(this.seieiURL + "/factoryCalendar/updateFestival", {
           params: args
         }).then((response) => {
           if (response.data.status == 0) {
@@ -511,11 +558,11 @@ export default {
       else if (!this.isModify) {
         var that = this;
         var args = {};
-        args.id = this.id;
-        args.holidaysname = this.inputFestivalName;
-        args.begindate = this.inputFestivalBtime.getTime();
-        args.etime = this.inputFestivalEtime.getTime();
-        this.axios.get(this.seieiURL + "/factorycalender/insertFestival", {
+        args.factoryCalendarId = this.idOfFactoryCalendar;
+        args.festivalName = this.inputFestivalName;
+        args.beginDate = this.inputFestivalBtime.getTime();
+        args.endDate = this.inputFestivalEtime.getTime();
+        this.axios.get(this.seieiURL + "/factoryCalendar/addFestival", {
           params: args
         }).then((response) => {
           if (response.data.status == 0) {
@@ -552,15 +599,13 @@ export default {
     },
     // 提交修改主档信息
     submit: function() {
-      if (!this.nowYear || !this.workDayBtime || !this.workDayEtime) {
+      if (!this.nowYear) {
         this.$Message.error("年度、开始时间及结束时间不能为空");
       } else {
         var that = this;
         var args = {};
-        args.id = this.id;
+        args.id = this.idOfFactoryCalendar;
         args.effectiveYear = (new Date(this.nowYear)).getFullYear();
-        args.beginWorkingTime = this.workDayBtime;
-        args.endWorkingTime = this.workDayEtime;
         if (this.workDates.length == 0) {
           args.monday = false;
           args.tuesday = false;
@@ -581,65 +626,42 @@ export default {
           });
         }
         this.isSubmitloading = true;
-        if (!this.isAddMainTable) {
-          this.axios.get(this.seieiURL + "/workingDateSetting/update", {
-            params: args
-          }).then((response) => {
-            this.isSubmitloading = false;
-            if (response.data.status == 0) {
-              that.$Message.success(response.data.msg);
-              that.isShowSettingBlock = false;
-              that.reloadMainTable();
-            } else {
-              that.$Message.error(response.data.msg);
-            }
-          }).catch((error) => {
-            that.$Message.error({
-              content: "服务器异常,请刷新！！",
-              duration: 0,
-              closable: true
-            });
-            console.log(error)
+        this.axios.get(this.seieiURL + "/factoryCalendar/updateFactoryCalendar", {
+          params: args
+        }).then((response) => {
+          this.isSubmitloading = false;
+          if (response.data.status == 0) {
+            that.$Message.success(response.data.msg);
+            that.isShowSettingBlock = false;
+            that.reloadMainTable();
+          } else {
+            that.$Message.error(response.data.msg);
+          }
+        }).catch((error) => {
+          that.$Message.error({
+            content: "服务器异常,请刷新！！",
+            duration: 0,
+            closable: true
           });
-        } else {
-          this.axios.get(this.seieiURL + "/factorycalender/insertMainTable", {
-            params: args
-          }).then((response) => {
-            this.isSubmitloading = false;
-            if (response.data.status == 0) {
-              that.isAddMainTable = false;
-              that.$Message.success(response.data.msg);
-              that.isShowSettingBlock = false;
-              that.reloadMainTable();
-            } else {
-              that.$Message.error(response.data.msg);
-            }
-          }).catch((error) => {
-            that.$Message.error({
-              content: "服务器异常,请刷新！！",
-              duration: 0,
-              closable: true
-            });
-            console.log(error)
-          });
-        }
+          console.log(error)
+        });
       }
     },
     // 退出设置
     getOut: function() {
       this.inputTableData = [];
-      this.isAddMainTable = false;
       this.isShowSettingBlock = false;
+      this.reloadMainTable();
     },
     deleteSumTable: function(data, id) {
       this.isShowDeleteBlock = true;
-      this.id = data.id;
+      this.idOfFactoryCalendar = data.id;
     },
     deleteBlockOk: function() {
       var that = this;
-      this.axios.get(this.seieiURL + "/factorycalender/deleteMainTable", {
+      this.axios.get(this.seieiURL + "/factoryCalendar/deleteFactoryCalendar", {
         params: {
-          id: this.id
+          id: this.idOfFactoryCalendar
         }
       }).then((response) => {
         if (response.data.status == 0) {
