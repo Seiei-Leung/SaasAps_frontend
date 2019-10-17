@@ -59,30 +59,34 @@
         <div slot="right">
           <div class="right-split-pane">
             <div class="rightBlock" ref="rightBlock">
-              <Tabs type="card" closable @on-tab-remove="handleTabRemove" :value="activeTab">
+              <Tabs type="card" closable @on-tab-remove="handleTabRemove" :value="activeTab" name="indexContentSplit">
                 <!-- 用户设置 -->
-                <TabPane label="用户设置" v-if="isShowList['11']" name="11">
+                <TabPane label="用户设置" v-if="isShowList['11']" name="11" tab="indexContentSplit">
                   <v-userSetting></v-userSetting>
                 </TabPane>
                 <!-- 权限设置 -->
-                <TabPane label="权限设置" v-if="isShowList['12']" name="12">
+                <TabPane label="权限设置" v-if="isShowList['12']" name="12" tab="indexContentSplit">
                   <v-userRoleSetting></v-userRoleSetting>
                 </TabPane>
                 <!-- 用户组别 -->
-                <TabPane label="用户组别" v-if="isShowList['13']" name="13">
+                <TabPane label="用户组别" v-if="isShowList['13']" name="13" tab="indexContentSplit">
                   <v-userGroup></v-userGroup>
                 </TabPane>
                 <!-- 生产设置 -->
-                <TabPane label="生产设置" v-if="isShowList['31']" name="31">
+                <TabPane label="生产设置" v-if="isShowList['31']" name="31" tab="indexContentSplit">
                   <v-productionSetting></v-productionSetting>
                 </TabPane>
                 <!-- 工厂日历 -->
-                <TabPane label="工厂日历" v-if="isShowList['32']" name="32">
+                <TabPane label="工厂日历" v-if="isShowList['32']" name="32" tab="indexContentSplit">
                   <v-factoryCalendar></v-factoryCalendar>
                 </TabPane>
                 <!-- 排产品类 -->
-                <TabPane label="排产品类" v-if="isShowList['33']" name="33">
+                <TabPane label="排产品类" v-if="isShowList['33']" name="33" tab="indexContentSplit">
                   <v-productionClass></v-productionClass>
+                </TabPane>
+                <!-- 排产品类 -->
+                <TabPane label="走货一览表" v-if="isShowList['41']" name="41" tab="indexContentSplit">
+                  <v-productionPlanningDetail></v-productionPlanningDetail>
                 </TabPane>
               </Tabs>
             </div>
@@ -99,6 +103,7 @@ import productionClass from "../productionClass/productionClass";
 import userGroup from "../userGroup/userGroup";
 import userSetting from "../userSetting/userSetting";
 import userRoleSetting from "../userRoleSetting/userRoleSetting";
+import productionPlanningDetail from "../productionPlanningSetting/productionPlanningSetting";
 
 const headerBarHeight = 40;
 
@@ -114,7 +119,8 @@ export default {
         13: false, // 用户组别
         32: false, // 工厂日历
         31: false, // 生产设置
-        33: false // 排产品类
+        33: false, // 排产品类
+        41: false, // 走货一览表
       },
       nowShowingList: [], // 用于重新加载 Tab 组件
       activeTab: ""
@@ -196,7 +202,8 @@ export default {
     'v-productionClass': productionClass,
     'v-userGroup': userGroup,
     'v-userSetting': userSetting,
-    'v-userRoleSetting': userRoleSetting
+    'v-userRoleSetting': userRoleSetting,
+    'v-productionPlanningDetail': productionPlanningDetail,
   }
 }
 

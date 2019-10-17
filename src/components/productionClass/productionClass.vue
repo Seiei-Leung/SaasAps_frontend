@@ -218,10 +218,6 @@ export default {
       inputEfficiency: 0, // 详情效率
       inputDetailIndex: 0, // 详情的索引
       inputIdOfDetail: "", // 详情 ID
-
-
-
-
     }
   },
   methods: {

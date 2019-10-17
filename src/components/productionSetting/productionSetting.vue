@@ -62,8 +62,8 @@
           </div>
           <div class="bottomBlock">
             <Divider class="headerDivider" style="font-weight:normal;">其 他 设 置</Divider>
-            <Tabs type="card">
-              <TabPane label="属性效率设置">
+            <Tabs type="card" value="a" name="productionSetting">
+              <TabPane label="属性效率设置" name="a" tab="productionSetting">
                 <Table height="300" border :columns="attributeTableTitle" :data="attributeTableData" :loading="inputTableLoading"></Table>
                 <div class="addBlock">
                   <Button type="warning" @click="addAttributeTable" size="small">
@@ -71,7 +71,7 @@
                   </Button>
                 </div>
               </TabPane>
-              <TabPane label="日期工时设置">
+              <TabPane label="日期工时设置" name="b" tab="productionSetting">
                 <Table height="300" border :columns="workTimeTableTitle" :data="workTimeTableData"></Table>
                 <div class="addBlock">
                   <Button type="warning" @click="addWorkTimeTable" size="small">
@@ -79,7 +79,7 @@
                   </Button>
                 </div>
               </TabPane>
-              <TabPane label="日期人数设置">
+              <TabPane label="日期人数设置" name="c" tab="productionSetting">
                 <Table height="300" border :columns="peopleNumTableTitle" :data="peopleNumTableData"></Table>
                 <div class="addBlock">
                   <Button type="warning" @click="addPeopleNumTable" size="small">
