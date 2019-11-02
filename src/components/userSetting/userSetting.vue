@@ -164,6 +164,11 @@ export default {
       var that = this;
       this.isShowSpin = true;
       this.axios.get(this.seieiURL + "/usergroup/getall").then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.treeData = response.data.data;
         that.isShowSpin = false;
       }).catch((error) => {
@@ -217,6 +222,11 @@ export default {
           usergroupid: data.resource.id
         }
       }).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.tableLoading = false;
         that.tableData = response.data.data;
       }).catch((error) => {
@@ -287,6 +297,7 @@ export default {
           }
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -317,6 +328,7 @@ export default {
           that.tableData.splice(that.inputIndex, 1);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({

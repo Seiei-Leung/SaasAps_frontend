@@ -37,6 +37,15 @@ export default {
     if (usermsg) {
       this.$store.commit("setUserRole", JSON.parse(usermsg).role);
     }
+    var href = window.location.href;
+    var index = href.match("/signIn");
+    if (index != null && sessionStorage.getItem(CONST.IS_ONLINE)) {
+			sessionStorage.clear();
+      href = href.split("signIn")[0];
+			this.$store.commit("setIsSignin", false);
+			this.$store.commit("setUserRole", 0);
+      window.location.assign(href);
+    }
   },
   components: {
     'v-signin': signIn,

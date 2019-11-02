@@ -71,6 +71,11 @@ export default {
       this.isShowSpinTop = true;
       this.isShowSpinRight = true;
       this.axios.get(this.seieiURL + "/usergroup/getall").then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.treeData = response.data.data;
         that.isShowSpinTop = false;
       }).catch((error) => {
@@ -83,6 +88,11 @@ export default {
         console.log(error)
       });
       this.axios.get(this.seieiURL + "/productionlineright/getall").then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.mainTreeData.push(response.data.data);
         that.isShowSpinRight = false;
       }).catch((error) => {
@@ -103,6 +113,11 @@ export default {
           usergroupid: data[0].resource.id
         }
       }).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.tableLoading = false;
         that.tableData = response.data.data;
       }).catch((error) => {
@@ -124,6 +139,11 @@ export default {
           userid: data.id
         }
       }).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         this.test = true
         var resultList = [];
         var
@@ -209,6 +229,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.tableLoading = false;

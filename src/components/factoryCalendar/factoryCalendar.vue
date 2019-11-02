@@ -357,6 +357,11 @@ export default {
       var that = this;
       this.sumTableLoading = true;
       this.axios.get(this.seieiURL + '/factoryCalendar/getFactoryCalendarList').then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         var list = [];
         response.data.data.forEach((item) => {
           var listItem = {};
@@ -429,7 +434,6 @@ export default {
       this.axios.get(this.seieiURL + "/factoryCalendar/addFactoryCalendar", {
         params: args
       }).then((response) => {
-        console.log(response)
         if (response.data.status == 0) {
           that.$Message.success(response.data.msg);
           that.isShowSettingBlock = true;
@@ -437,6 +441,7 @@ export default {
           that.idOfFactoryCalendar = response.data.data;
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -456,6 +461,11 @@ export default {
       this.inputTableLoading = true;
       var that = this;
       this.axios.get(this.seieiURL + '/factoryCalendar/getFestival?id=' + data.id).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         var list = [];
         response.data.data.forEach((item) => {
           var listItem = {};
@@ -506,6 +516,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -544,6 +555,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -575,6 +587,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -636,6 +649,7 @@ export default {
             that.reloadMainTable();
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -669,6 +683,7 @@ export default {
           that.reloadMainTable();
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({

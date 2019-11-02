@@ -135,7 +135,9 @@ export default {
     openTag: function(name) {
       // 如果点击排产器，跳转页面
       if (name == "42") {
-        window.open("http://localhost:8080/ProduceSchedule/productSchedule.html");
+        var href = window.location.href;
+        href = href.split("/#")[0] + "/ps/#/";
+        window.open(href);
         return true;
       }
       // 框架有bug，必须按 TabPane 组件Dom书写顺序进行加载组件，否则会导致 Tab 组件与 TabPane 组件内容错乱

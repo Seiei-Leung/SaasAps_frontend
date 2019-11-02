@@ -415,6 +415,11 @@ export default {
       this.sumTableDataForShow = [];
       this.sumTableLoading = true;
       this.axios.get(this.seieiURL + '/productionline/getall').then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         response.data.data.forEach((item) => {
           var listItem = {};
           listItem.workgroup = item.workgroup;
@@ -477,6 +482,11 @@ export default {
           lineid: this.inputProductionLineId
         }
       }).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.attributeTableData = response.data.data.efficiencyOfLineList;
         response.data.data.workhoursOfLineList.forEach((item) => {
           item.endTime = timeStampToString(new Date(item.endTime));
@@ -512,6 +522,7 @@ export default {
           that.filterSumTableData();
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -553,6 +564,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -594,6 +606,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -620,6 +633,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -658,6 +672,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -710,6 +725,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -738,6 +754,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -776,6 +793,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -820,6 +838,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -848,6 +867,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -895,6 +915,7 @@ export default {
           } else {
             that.$Message.error(response.data.msg);
             that.isSubmitloading = false;
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -940,6 +961,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -966,6 +988,11 @@ export default {
     });
     this.reloadMainTable();
     this.axios.get(this.seieiURL + "/productstyle/getall").then((response) => {
+      if (response.data.status) {
+        that.$Message.error(response.data.msg);
+        that.isInvaildSession(response.data.status);
+        return;
+      }
       that.properityNameList = response.data.data;
     }).catch((error) => {
       that.$Message.error({

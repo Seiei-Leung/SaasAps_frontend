@@ -44,6 +44,11 @@ export default {
     reloadMainTable: function() {
       var that = this;
       this.axios.get(this.seieiURL + "/usergroup/getall").then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.treeData = response.data.data;
       }).catch((error) => {
         that.$Message.error({
@@ -158,6 +163,7 @@ export default {
             that.groupName = "";
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -192,6 +198,7 @@ export default {
           parent.children.splice(index, 1);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({

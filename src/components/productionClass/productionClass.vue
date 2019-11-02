@@ -226,6 +226,11 @@ export default {
       var that = this;
       this.sumTableLoading = true;
       this.axios.get(this.seieiURL + '/productclass/getAllProductClass').then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.sumTableData = response.data.data;
         that.sumTableLoading = false;
       }).catch((error) => {
@@ -257,6 +262,7 @@ export default {
       }).then((response) => {
         if (response.data.status) {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         } else {
           that.isShowAddProductClass = false;
           that.inputIdOfProductClass = response.data.data;
@@ -292,6 +298,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -351,6 +358,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -379,6 +387,7 @@ export default {
             that.$Message.success(response.data.msg);
           } else {
             that.$Message.error(response.data.msg);
+            that.isInvaildSession(response.data.status);
           }
         }).catch((error) => {
           that.$Message.error({
@@ -407,6 +416,7 @@ export default {
           that.$Message.success(response.data.msg);
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -431,6 +441,11 @@ export default {
           productClassId: this.inputIdOfProductClass
         }
       }).then((response) => {
+        if (response.data.status) {
+          that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
+          return;
+        }
         that.detailData = response.data.data;
         that.inputTableLoading = false;
       }).catch((error) => {
@@ -471,6 +486,7 @@ export default {
           that.reloadMainTable();
         } else {
           that.$Message.error(response.data.msg);
+          that.isInvaildSession(response.data.status);
         }
       }).catch((error) => {
         that.$Message.error({
@@ -488,6 +504,11 @@ export default {
   created: function() {
     var that = this;
     this.axios.get(this.seieiURL + "/productstyle/getall").then((response) => {
+      if (response.data.status) {
+        that.$Message.error(response.data.msg);
+        that.isInvaildSession(response.data.status);
+        return;
+      }
       that.properityNameList = response.data.data;
     }).catch((error) => {
       that.$Message.error({

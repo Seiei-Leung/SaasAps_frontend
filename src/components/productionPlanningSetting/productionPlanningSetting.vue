@@ -608,6 +608,12 @@ export default {
           var that = this;
           this.sumTableLoading = true;
           this.axios.get(this.seieiURL + "/summaryOfProductionPlanning/getAll?pageIndex=" + this.currentPageIndex + "&pageSize=" + this.pageSize).then((response) => {
+            
+            if (response.data.status) {
+              that.$Message.error(response.data.msg);
+              that.isInvaildSession(response.data.status);
+              return;
+            }
             that.currentPageIndex = response.data.data.pageNum;
             that.totalOfPage = response.data.data.total;
             that.sumTableData = response.data.data.list;
@@ -632,6 +638,7 @@ export default {
           }).then((response) => {
             if (response.data.status) {
               that.$Message.error(response.data.msg);
+              that.isInvaildSession(response.data.status);
             } else {
               that.inputSummaryData = data;
               that.inputSeasonOfSummaryData = data.season;
@@ -683,6 +690,7 @@ export default {
           }).then((response) => {
             if (response.data.status) {
               that.$Message.error(response.data.msg);
+              that.isInvaildSession(response.data.status);
             } else {
               that.$Message.success(response.data.msg);
               that.reloadMainTable();
@@ -772,6 +780,7 @@ export default {
           this.axios.post(this.seieiURL + "/productionplanningdetail/updateDetail", args).then((response) => {
             if (response.data.status) {
               that.$Message.error(response.data.msg);
+              that.isInvaildSession(response.data.status);
             } else {
               that.$Message.success(response.data.msg);
               that.isShowModifyDetail = false;
@@ -800,6 +809,7 @@ export default {
           }).then((response) => {
             if (response.data.status) {
               that.$Message.error(response.data.msg);
+              that.isInvaildSession(response.data.status);
             } else {
               that.$Message.success(response.data.msg);
               that.showDetailList(that.inputSummaryData, null);
@@ -825,6 +835,7 @@ export default {
           }).then((response) => {
             if (response.data.status) {
               that.$Message.error(response.data.msg);
+              that.isInvaildSession(response.data.status);
             } else {
               that.isShowSettingBlock = false;
               that.$Message.success(response.data.msg);
@@ -860,7 +871,7 @@ export default {
 
 .productionPlanningSettingWrapper .inputBar .title {
   display: inline-block;
-  margin-left: 5px;
+  margin-left: 15px;
   line-height: 40px;
   font-size: 18px;
   vertical-align: top
