@@ -25,7 +25,6 @@
                     参数设置
                   </template>
                   <MenuItem name="21">颜色设置</MenuItem>
-                  <MenuItem name="22">图标设置</MenuItem>
                 </Submenu>
                 <Submenu name="3">
                   <template slot="title">
@@ -72,6 +71,10 @@
                 <TabPane label="用户组别" v-if="isShowList['13']" name="13" tab="indexContentSplit">
                   <v-userGroup></v-userGroup>
                 </TabPane>
+                <!-- 颜色设置 -->
+                <TabPane label="颜色设置" v-if="isShowList['21']" name="21" tab="indexContentSplit">
+                  <v-colorSetting></v-colorSetting>
+                </TabPane>
                 <!-- 生产设置 -->
                 <TabPane label="生产设置" v-if="isShowList['31']" name="31" tab="indexContentSplit">
                   <v-productionSetting></v-productionSetting>
@@ -104,6 +107,7 @@ import userGroup from "../userGroup/userGroup";
 import userSetting from "../userSetting/userSetting";
 import userRoleSetting from "../userRoleSetting/userRoleSetting";
 import productionPlanningDetail from "../productionPlanningSetting/productionPlanningSetting";
+import colorSetting from "../colorSetting/colorSetting";
 
 const headerBarHeight = 40;
 
@@ -117,6 +121,7 @@ export default {
         11: false, // 用户设置
         12: false, // 权限设置
         13: false, // 用户组别
+        21: false, // 颜色设置
         32: false, // 工厂日历
         31: false, // 生产设置
         33: false, // 排产品类
@@ -206,6 +211,7 @@ export default {
     'v-userSetting': userSetting,
     'v-userRoleSetting': userRoleSetting,
     'v-productionPlanningDetail': productionPlanningDetail,
+    'v-colorSetting': colorSetting,
   }
 }
 

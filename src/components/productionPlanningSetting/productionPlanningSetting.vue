@@ -18,9 +18,12 @@
                 name="excelFile"
                 :action="uploadUrl"
                 :format="['xls','xlsx']"
+                :disabled="uploadLoading"
                 :on-format-error="handleFormatError"
+                :on-progress="uploadProgress"
+                :on-error="uploadError"
                 :on-success="uploadSuccess">
-                <Button type="primary" icon="ios-cloud-upload-outline">上传走货一览表</Button>
+                <Button type="primary" :loading="uploadLoading" icon="ios-cloud-upload-outline">上传走货一览表</Button>
               </Upload>
           </div>
         </div>
@@ -171,6 +174,16 @@
                   <InputNumber :min="0" :step="1" v-model="inputadvancecuttingDaynum" style="width: 150px"></InputNumber>
                 </div>
               </div>
+              <div class="inputFlexWrapper">
+                <div class="inputWrapper">
+                  <div class="title">颜色：</div>
+                  <Input v-model="inputColor" style="width: 150px"/>
+                </div>
+                <div class="inputWrapper">
+                  <div class="title">尺码：</div>
+                  <Input v-model="inputSizes" style="width: 150px"/>
+                </div>
+              </div>
               <div class="inputWrapper">
                 <div class="title">面料：</div>
                 <Input v-model="inputlining"/>
@@ -301,6 +314,18 @@ export default {
               {
                 title: '品名/款式',
                 key: 'goodname',
+                align: "center",
+                width: 100,
+              },
+              {
+                title: '颜色',
+                key: 'color',
+                align: "center",
+                width: 100,
+              },
+              {
+                title: '尺码',
+                key: 'sizes',
                 align: "center",
                 width: 100,
               },
@@ -514,6 +539,7 @@ export default {
             sumTableLoading: true, // 主表 Loading
             detailTableData: [], // 副表数据
             detailTableLoading: true, // 副表 Loading
+            uploadLoading: false, // 加载按钮 loading
             uploadUrl: '', // 上传Excel地址
             totalOfPage: 0, // 显示的总条数
             pageSize: 10, // 一页显示的条数
@@ -550,6 +576,8 @@ export default {
             inputcuttingqty: "",
             inputisFinishCutting: "",
             inputadvancecuttingDaynum: "",
+            inputColor: "",
+            inputSizes: "",
             inputorderkind: "",
             inputsuppliesoflining: "",
             inputsamoflocal: "",
@@ -590,8 +618,18 @@ export default {
                 desc: '上传文件必须为 xls 或 xlsx 格式'
             });
         },
+        // 上传文件中事件
+        uploadProgress: function() {
+          this.uploadLoading = true;
+        },
+        // 文件上传失败
+        uploadError: function(res, file) {
+          this.$Message.error(res);
+          this.uploadLoading = false;
+        },
         // Excel 文件上传成功
         uploadSuccess: function(res, file) {
+          this.uploadLoading = false;
           if (res.status) {
             this.$Message.error(res.msg);
           } else {
@@ -732,6 +770,8 @@ export default {
           this.inputcuttingqty =  data.cuttingqty;
           this.inputisFinishCutting =  data.isFinishCutting;
           this.inputadvancecuttingDaynum =  data.advancecuttingDaynum;
+          this.inputSizes = data.sizes;
+          this.inputColor = data.color;
           this.inputorderkind =  data.orderkind;
           this.inputsuppliesoflining =  data.suppliesoflining;
           this.inputsamoflocal =  data.samoflocal;
@@ -770,6 +810,8 @@ export default {
           args.cuttingqty = this.inputcuttingqty;
           args.isFinishCutting = this.inputisFinishCutting;
           args.advancecuttingDaynum = this.inputadvancecuttingDaynum;
+          args.color = this.inputColor;
+          args.sizes = this.inputSizes;
           args.orderkind = this.inputorderkind;
           args.suppliesoflining = this.inputsuppliesoflining;
           args.samoflocal = this.inputsamoflocal;

@@ -58,6 +58,14 @@
               <div class="inputWrapper">
                 <InputNumber :min="0" :step="0.1" v-model="inputWorkHours" style="width: 100px"></InputNumber>
               </div>
+              <div class="title">
+                默认属性：
+              </div>
+              <div class="inputWrapper">
+                <Select v-model="inputDefaultStyleName" style="margin-left: 7px;width: 100px">
+                  <Option v-for="item in properityNameList" :value="item.name" :key="item.name">{{ item.name }}</Option>
+                </Select>
+              </div>
             </div>
           </div>
           <div class="bottomBlock">
@@ -128,15 +136,20 @@
             </Modal>
             <!-- 新增生产线 -->
             <Modal v-model="isShowAddProductionLine" v-bind:title="addProductionLineTitle" @on-ok="addProductionLine" @on-cancel="addProductionLineCancel" ok-text="确认" cancel-text="取消">
-              <div style="margin-left: 12px;">组别：<Input v-model="inputWorkGroup" style="margin-left: 10px;width: 100px" />
+              <div style="margin-left: 41px">组别：<Input v-model="inputWorkGroup" style="margin-left: 10px;width: 100px" />
               </div>
-              <div style="margin-top:20px;margin-left: 12px;">车间：<Input v-model="inputWorkShop" style="margin-left: 10px;width: 100px" />
+              <div style="margin-top:20px;margin-left: 41px">车间：<Input v-model="inputWorkShop" style="margin-left: 10px;width: 100px" />
               </div>
-              <div style="margin-top:20px;">生产线：<Input v-model="inputLineCode" style="margin-left: 10px;width: 100px" />
+              <div style="margin-top:20px;margin-left: 28px;">生产线：<Input v-model="inputLineCode" style="margin-left: 10px;width: 100px" />
               </div>
-              <div style="margin-top:20px;margin-left: 12px;">人数：<InputNumber :min="0" :step="1" v-model="inputPeopleNum" style="margin-left: 10px;width: 100px"></InputNumber>
+              <div style="margin-top:20px;margin-left: 41px">人数：<InputNumber :min="0" :step="1" v-model="inputPeopleNum" style="margin-left: 10px;width: 100px"></InputNumber>
               </div>
-              <div style="margin-top:20px;margin-left: 12px;">工时：<InputNumber :min="0" :step="0.1" v-model="inputWorkHours" style="margin-left: 10px;width: 100px"></InputNumber>
+              <div style="margin-top:20px;margin-left: 41px">工时：<InputNumber :min="0" :step="0.1" v-model="inputWorkHours" style="margin-left: 10px;width: 100px"></InputNumber>
+              </div>
+              <div style="margin-top:20px;margin-left: 12px">默认属性：
+                <Select v-model="inputDefaultStyleName" style="margin-left: 7px;width: 100px">
+                  <Option v-for="item in properityNameList" :value="item.name" :key="item.name">{{ item.name }}</Option>
+                </Select>
               </div>
             </Modal>
           </div>
@@ -223,6 +236,7 @@ export default {
       inputLineCode: "", // 主档输入生产线
       inputWorkHours: 0, // 主档输入工时
       inputPeopleNum: 0, // 主档输入人数
+      inputDefaultStyleName: "", // 主档输入默认属性
 
       // 属性效率表头
       attributeTableTitle: [{
@@ -429,6 +443,7 @@ export default {
           listItem.workhours = item.workhours;
           listItem.peopleNum = item.peopleNum;
           listItem.id = item.id;
+          listItem.defaultStyleName = item.defaultStyleName;
           that.sumTableDataForResource.push(listItem);
           that.sumTableDataForShow.push(listItem);
         });
@@ -475,6 +490,7 @@ export default {
       this.inputProductionLineId = data.id;
       this.inputPeopleNum = data.peopleNum;
       this.inputWorkHours = data.workhours;
+      this.inputDefaultStyleName = data.defaultStyleName;
       this.inputTableLoading = true;
       var that = this;
       this.axios.get(this.seieiURL + "/productionline/getdetailbylineid", {
@@ -513,7 +529,7 @@ export default {
       var that = this;
       this.axios.get(this.seieiURL + "/productionline/delete", {
         params: {
-          id: this.inputProductionLineId
+          id: this.sumTableDataForShow[index].id
         }
       }).then((response) => {
         if (response.data.status == 0) {
@@ -541,6 +557,7 @@ export default {
       this.inputLineCode = "";
       this.inputWorkHours = 0;
       this.inputPeopleNum = 0;
+      this.inputDefaultStyleName = "";
     },
     // 点击属性从表中的修改按钮
     changeAttributeTable: function(index) {
@@ -893,8 +910,8 @@ export default {
     },
     // 点击提交主档按钮
     submit: function() {
-      if (!this.inputWorkGroup || !this.inputWorkShop || !this.inputLineCode) {
-        this.$Message.error("组别、车间及生产线不能为空");
+      if (!this.inputWorkGroup || !this.inputWorkShop || !this.inputLineCode || !this.inputDefaultStyleName) {
+        this.$Message.error("组别、车间、生产线及默认属性不能为空");
       } else {
         this.isSubmitloading = true;
         var that = this;
@@ -906,7 +923,8 @@ export default {
             workshop: this.inputWorkShop,
             lineCode: this.inputLineCode,
             workhours: this.inputWorkHours,
-            peopleNum: this.inputPeopleNum
+            peopleNum: this.inputPeopleNum,
+            defaultStyleName: this.inputDefaultStyleName
           }
         }).then((response) => {
           if (response.data.status == 0) {
@@ -948,7 +966,8 @@ export default {
           workshop: this.inputWorkShop,
           lineCode: this.inputLineCode,
           peopleNum: this.inputPeopleNum,
-          workhours: this.inputWorkHours
+          workhours: this.inputWorkHours,
+          defaultStyleName: this.inputDefaultStyleName
         }
       }).then((response) => {
         if (response.data.status == 0) {
