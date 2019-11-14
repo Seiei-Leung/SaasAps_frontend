@@ -18,6 +18,8 @@
   </div>
 </template>
 <script type="text/javascript">
+import CONST from "../../common/const";
+
 export default {
   data: function() {
     return {
@@ -45,9 +47,9 @@ export default {
         pwd: this.password
       }).then((response) => {
         if (response.data.status == 0) {
-          sessionStorage.setItem(CONST.IS_ONLINE, true);
+          sessionStorage.setItem(CONST.CONSTOFUSER.IS_ONLINE, true);
           var usermsg = JSON.stringify(response.data.data);
-          sessionStorage.setItem(CONST.CURRENT_USER_MSG, usermsg);
+          sessionStorage.setItem(CONST.CONSTOFUSER.CURRENT_USER_MSG, usermsg);
           that.$Message.success(response.data.msg);
           that.$store.commit("setIsSignin", true);
           that.$store.commit("setUserRole", response.data.data.role);

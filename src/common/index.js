@@ -6,8 +6,7 @@ export default{
 			data: function() {
 				return {
 					appName: "衣尚科技",
-					seieiURL: "http://localhost:8080/api",
-					// seieiURL: "http://www.etscn.com.cn:58080/SaasapsBackEnd/api/",
+					seieiURL: "",
 					windowWidth: "",
 					windowHeight: ""
 				}
@@ -26,6 +25,7 @@ export default{
 			created: function () {
 				this.windowWidth = window.innerwidth;
 				this.windowHeight = window.innerHeight;
+				this.seieiURL = location.href.split("SaasapsBackEnd/")[0] + "SaasapsBackEnd/api";
     		}
 		})
 	}

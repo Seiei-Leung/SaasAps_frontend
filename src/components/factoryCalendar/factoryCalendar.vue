@@ -126,6 +126,8 @@
   </div>
 </template>
 <script>
+import DateUtil from "../../common/DateUtil";
+
 export default {
   data: function() {
     return {
@@ -470,8 +472,8 @@ export default {
         response.data.data.forEach((item) => {
           var listItem = {};
           listItem.festivalName = item.festivalName;
-          listItem.btime = timeStampToString(new Date(item.beginDate));
-          listItem.etime = timeStampToString(new Date(item.endDate));
+          listItem.btime = DateUtil.timeStampToDate(new Date(item.beginDate));
+          listItem.etime = DateUtil.timeStampToDate(new Date(item.endDate));
           listItem.id = item.id;
           that.inputTableData.push(listItem);
         });
@@ -539,8 +541,8 @@ export default {
         this.isModify = false;
         this.$set(this.inputTableData, [this.modifyIndex], {
           "festivalName": this.inputFestivalName,
-          "btime": timeStampToString(this.inputFestivalBtime),
-          "etime": timeStampToString(this.inputFestivalEtime),
+          "btime": DateUtil.timeStampToDate(this.inputFestivalBtime),
+          "etime": DateUtil.timeStampToDate(this.inputFestivalEtime),
           "id": this.inputTableData[this.modifyIndex].id
         });
         var args = {};
@@ -580,8 +582,8 @@ export default {
           if (response.data.status == 0) {
             that.$set(that.inputTableData, that.inputTableData.length, {
               "festivalName": that.inputFestivalName,
-              "btime": timeStampToString(that.inputFestivalBtime),
-              "etime": timeStampToString(that.inputFestivalEtime),
+              "btime": DateUtil.timeStampToDate(that.inputFestivalBtime),
+              "etime": DateUtil.timeStampToDate(that.inputFestivalEtime),
               "id": response.data.data
             });
             that.$Message.success(response.data.msg);

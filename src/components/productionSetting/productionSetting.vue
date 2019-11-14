@@ -159,6 +159,8 @@
   </div>
 </template>
 <script>
+import DateUtil from "../../common/DateUtil";
+
 export default {
   data: function() {
     return {
@@ -505,13 +507,13 @@ export default {
         }
         that.attributeTableData = response.data.data.efficiencyOfLineList;
         response.data.data.workhoursOfLineList.forEach((item) => {
-          item.endTime = timeStampToString(new Date(item.endTime));
-          item.startTime = timeStampToString(new Date(item.startTime));
+          item.endTime = DateUtil.timeStampToDate(new Date(item.endTime));
+          item.startTime = DateUtil.timeStampToDate(new Date(item.startTime));
         });
         that.workTimeTableData = response.data.data.workhoursOfLineList;
         response.data.data.peopleNumOfLineList.forEach((item) => {
-          item.endTime = timeStampToString(new Date(item.endTime));
-          item.startTime = timeStampToString(new Date(item.startTime));
+          item.endTime = DateUtil.timeStampToDate(new Date(item.endTime));
+          item.startTime = DateUtil.timeStampToDate(new Date(item.startTime));
         });
         that.peopleNumTableData = response.data.data.peopleNumOfLineList;
         that.inputTableLoading = false;
@@ -735,8 +737,8 @@ export default {
           if (response.data.status == 0) {
             that.$set(that.workTimeTableData, [that.settingWorkTimeIndex], {
               id: that.settingWorkTimeId,
-              startTime: timeStampToString(that.settingWorkTimeBtime),
-              endTime: timeStampToString(that.settingWorkTimeEtime),
+              startTime: DateUtil.timeStampToDate(that.settingWorkTimeBtime),
+              endTime: DateUtil.timeStampToDate(that.settingWorkTimeEtime),
               workhours: that.settingWorkTime
             });
             that.$Message.success(response.data.msg);
@@ -763,8 +765,8 @@ export default {
         }).then((response) => {
           if (response.data.status == 0) {
             that.$set(that.workTimeTableData, that.workTimeTableData.length, {
-              startTime: timeStampToString(this.settingWorkTimeBtime),
-              endTime: timeStampToString(this.settingWorkTimeEtime),
+              startTime: DateUtil.timeStampToDate(this.settingWorkTimeBtime),
+              endTime: DateUtil.timeStampToDate(this.settingWorkTimeEtime),
               workhours: this.settingWorkTime,
               id: response.data.data
             });
@@ -848,8 +850,8 @@ export default {
           if (response.data.status == 0) {
             that.$set(that.peopleNumTableData, [that.settingPeopleNumIndex], {
               id: that.settingPeopleNumId,
-              startTime: timeStampToString(that.settingPeopleNumBtime),
-              endTime: timeStampToString(that.settingPeopleNumEtime),
+              startTime: DateUtil.timeStampToDate(that.settingPeopleNumBtime),
+              endTime: DateUtil.timeStampToDate(that.settingPeopleNumEtime),
               peopleNum: that.settingPeopleNum
             });
             that.$Message.success(response.data.msg);
@@ -876,8 +878,8 @@ export default {
         }).then((response) => {
           if (response.data.status == 0) {
             that.$set(that.peopleNumTableData, that.peopleNumTableData.length, {
-              startTime: timeStampToString(that.settingPeopleNumBtime),
-              endTime: timeStampToString(that.settingPeopleNumEtime),
+              startTime: DateUtil.timeStampToDate(that.settingPeopleNumBtime),
+              endTime: DateUtil.timeStampToDate(that.settingPeopleNumEtime),
               peopleNum: that.settingPeopleNum,
               id: response.data.data
             });

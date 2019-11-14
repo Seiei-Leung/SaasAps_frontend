@@ -1,7 +1,6 @@
 <template>
   <div id="productionPlanningSetting-component">
     <div class="productionPlanningSettingWrapper rightBlockTabpaneWrapper" ref="rightBlockTabpaneWrapper">
-      <transition name="fade">
         <div v-show="!isShowSettingBlock">
           <Table height="450" :loading="sumTableLoading" border :columns="sumTableTitle" :data="sumTableData" ></Table>
           <div style="margin-top: 10px;text-align: center;">
@@ -27,8 +26,6 @@
               </Upload>
           </div>
         </div>
-      </transition>
-      <transition name="fade">
         <div v-show="isShowSettingBlock">
           <div class="inputBar" style="margin-bottom: 10px;">
             <div class="title">
@@ -211,12 +208,11 @@
             </Modal>
           </div>
         </div>
-      </transition>
     </div>
   </div>
 </template>
 <script>
-import DateUtil from "../../util/DateUtil";
+import DateUtil from "../../common/DateUtil";
 
 export default {
     data: function() {

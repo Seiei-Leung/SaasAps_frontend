@@ -108,6 +108,7 @@ import userSetting from "../userSetting/userSetting";
 import userRoleSetting from "../userRoleSetting/userRoleSetting";
 import productionPlanningDetail from "../productionPlanningSetting/productionPlanningSetting";
 import colorSetting from "../colorSetting/colorSetting";
+import CONST from "../../common/const";
 
 const headerBarHeight = 40;
 
@@ -191,7 +192,7 @@ export default {
   },
   computed: {
     isAdmin: function() {
-      return this.$store.state.userRole == CONST.ISADMIN;
+      return this.$store.state.userRole == CONST.RANKOFUSER.ISADMIN;
     }
   },
   created: function() {

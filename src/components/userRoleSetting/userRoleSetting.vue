@@ -44,6 +44,8 @@
   </div>
 </template>
 <script>
+import CONST from "../../common/const";
+
 export default {
   data: function() {
     return {
@@ -245,11 +247,11 @@ export default {
   created: function() {
     // 页面初始化设置高度
     this.$nextTick(() => {
-      this.$refs["rightBlockTabpaneWrapper"].style.height = this.windowHeight - cssData.pageHeaderHeight - cssData.containerPageTabHeight + "px";
-      var topContainHeight = Math.floor((this.windowHeight - cssData.pageHeaderHeight - cssData.containerPageTabHeight - cssData.rightBlockTabpaneWrapperPaddingBottom) / 2) - cssData.topWrapperTitleHeight - cssData.topWrapperTitleMarginTop - cssData.borderHeight * 2;
+      this.$refs["rightBlockTabpaneWrapper"].style.height = this.windowHeight - CONST.cssData.pageHeaderHeight - CONST.cssData.containerPageTabHeight + "px";
+      var topContainHeight = Math.floor((this.windowHeight - CONST.cssData.pageHeaderHeight - CONST.cssData.containerPageTabHeight - CONST.cssData.rightBlockTabpaneWrapperPaddingBottom) / 2) - CONST.cssData.topWrapperTitleHeight - CONST.cssData.topWrapperTitleMarginTop - CONST.cssData.borderHeight * 2;
       this.tableHeight = topContainHeight;
       this.$refs["topContain"].style.height = topContainHeight + "px";
-      this.$refs["rightContainer"].style.height = this.windowHeight - cssData.pageHeaderHeight - cssData.containerPageTabHeight - cssData.rightBlockTabpaneWrapperPaddingBottom - cssData.topWrapperTitleHeight - cssData.borderHeight * 4 - 47 + "px";
+      this.$refs["rightContainer"].style.height = this.windowHeight - CONST.cssData.pageHeaderHeight - CONST.cssData.containerPageTabHeight - CONST.cssData.rightBlockTabpaneWrapperPaddingBottom - CONST.cssData.topWrapperTitleHeight - CONST.cssData.borderHeight * 4 - 47 + "px";
 
     });
     this.reloadMainTable();

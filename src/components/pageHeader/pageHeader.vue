@@ -32,6 +32,8 @@
   </div>
 </template>
 <script>
+import CONST from "../../common/const";
+
 export default {
   data: function() {
     return {
@@ -62,7 +64,7 @@ export default {
     }
   },
   created: function() {
-    var userMsg = JSON.parse(sessionStorage.getItem(CONST.CURRENT_USER_MSG));
+    var userMsg = JSON.parse(sessionStorage.getItem(CONST.CONSTOFUSER.CURRENT_USER_MSG));
     if (userMsg) {
       this.userName = userMsg.username;
       this.userID = userMsg.usercode;
