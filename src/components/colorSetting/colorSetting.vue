@@ -51,6 +51,14 @@
                         <ColorPicker v-model="unLockColor" />
                     </div>
                 </div>
+                <div class="item">
+                    <div class="title">
+                        选中时边框的颜色：
+                    </div>
+                    <div class="pickerWrapper">
+                        <ColorPicker v-model="selectedColor" />
+                    </div>
+                </div>
             </div>
             <div class="btnWrapper">
               <Button type="success" style="width: 200px;" size="large" @click="submit" :loading="isSubmitloading">
@@ -71,6 +79,7 @@ export default {
             advanceColor: "#fff", // 提前颜色
             delayColor: "#fff", // 推迟颜色
             unLockColor: "#fff", // 计划解锁时的边框颜色
+            selectedColor: "#fff", // 选中时边框的颜色
             advanceDaynum: 0, // 提前天数
             delayDaynum: 0, // 推迟天数
             isSubmitloading: false, // 按钮 loding
@@ -91,7 +100,8 @@ export default {
                 that.delayColor = response.data.data.delayColor; // 推迟颜色
                 that.advanceDaynum = response.data.data.advanceDaynum; // 提前天数
                 that.delayDaynum = response.data.data.delayDaynum; // 推迟天数
-                that.unLockColor = response.data.data.unlockColor; // 推迟天数
+                that.unLockColor = response.data.data.unlockColor; // 解锁时的颜色
+                that.selectedColor = response.data.data.selectedColor; // 选中时的颜色
             } else {
                 that.$Message.error(response.data.msg);
                 that.isInvaildSession(response.data.status);
@@ -119,6 +129,7 @@ export default {
             obj.advanceDaynum = this.advanceDaynum; // 提前天数
             obj.delayDaynum = this.delayDaynum; // 推迟天数
             obj.unLockColor = this.unLockColor; // 解锁颜色
+            obj.selectedColor = this.selectedColor; // 选中时的颜色
             this.axios.post(this.seieiURL + "/colorSetting/update", obj).then((response) => {
                 if (response.data.status == 0) {
                     that.$Message.success(response.data.msg);
