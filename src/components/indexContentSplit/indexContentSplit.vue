@@ -25,6 +25,7 @@
                     参数设置
                   </template>
                   <MenuItem name="21">颜色设置</MenuItem>
+                  <MenuItem name="22">参数设置</MenuItem>
                 </Submenu>
                 <Submenu name="3">
                   <template slot="title">
@@ -43,14 +44,14 @@
                   <MenuItem name="41">走货一览表</MenuItem>
                   <MenuItem name="42">排产器</MenuItem>
                 </Submenu>
-                <Submenu name="5">
+<!--                 <Submenu name="5">
                   <template slot="title">
                     <Icon type="ios-people" />
                     报表查询
                   </template>
                   <MenuItem name="5-1">生产排期查询</MenuItem>
                   <MenuItem name="5-2">SAH每月查询</MenuItem>
-                </Submenu>
+                </Submenu> -->
               </Menu>
             </div>
           </div>
@@ -74,6 +75,10 @@
                 <!-- 颜色设置 -->
                 <TabPane label="颜色设置" v-if="isShowList['21']" name="21" tab="indexContentSplit">
                   <v-colorSetting></v-colorSetting>
+                </TabPane>
+                <!-- 参数设置 -->
+                <TabPane label="参数设置" v-if="isShowList['22']" name="22" tab="indexContentSplit">
+                  <v-argumentSetting></v-argumentSetting>
                 </TabPane>
                 <!-- 生产设置 -->
                 <TabPane label="生产设置" v-if="isShowList['31']" name="31" tab="indexContentSplit">
@@ -108,6 +113,7 @@ import userSetting from "../userSetting/userSetting";
 import userRoleSetting from "../userRoleSetting/userRoleSetting";
 import productionPlanningDetail from "../productionPlanningSetting/productionPlanningSetting";
 import colorSetting from "../colorSetting/colorSetting";
+import argumentSetting from "../argumentSetting/argumentSetting";
 import CONST from "../../common/const";
 
 const headerBarHeight = 40;
@@ -123,6 +129,7 @@ export default {
         12: false, // 权限设置
         13: false, // 用户组别
         21: false, // 颜色设置
+        22: false, // 参数设置
         32: false, // 工厂日历
         31: false, // 生产设置
         33: false, // 排产品类
@@ -213,6 +220,7 @@ export default {
     'v-userRoleSetting': userRoleSetting,
     'v-productionPlanningDetail': productionPlanningDetail,
     'v-colorSetting': colorSetting,
+    'v-argumentSetting': argumentSetting,
   }
 }
 
@@ -283,5 +291,10 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+.InputWrapper {
+  margin: auto;
+  margin-top: 30px;
+  text-align: center;
 }
 </style>

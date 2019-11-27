@@ -108,6 +108,9 @@ export default {
       });
     },
     selectUserGroup: function(data) {
+      if (data[0] == null) {
+        return;
+      }
       var that = this;
       this.tableLoading = true;
       this.axios.get(this.seieiURL + "/user/getallbyusergroupid", {
