@@ -5,6 +5,17 @@
             <Divider class="headerDivider">减 数 及 修 改 效 率 设 置</Divider>
             <div class="item">
                 <div class="title">
+                    减数后自动顺延：
+                </div>
+                <dvi class="content">
+                    <i-switch v-model="afterMinusHasamend">
+                        <span slot="open">开</span>
+                        <span slot="close">关</span>
+                    </i-switch>
+                </dvi>
+            </div>
+            <div class="item">
+                <div class="title">
                     减数及修改效率后自动消除时间空隙：
                 </div>
                 <dvi class="content">
@@ -29,6 +40,7 @@ export default {
         return {
             inputId: null, // 参数设置主键
             afterMinusorchangeefficiencyHasremovegapmodel: false, // 减数，修改效率之后是否自动消除时间空隙
+            afterMinusHasamend: false, // 减数后是否后续计划进行调整
             isSubmitloading: false, // 提交 loading
         }
     },
@@ -39,6 +51,7 @@ export default {
             this.axios.get(this.seieiURL + "/argumentSetting/getAll").then((response) => {
                 if (response.data.status == 0) {
                     that.afterMinusorchangeefficiencyHasremovegapmodel = response.data.data.afterMinusorchangeefficiencyHasremovegapmodel;
+                    that.afterMinusHasamend = response.data.data.afterMinusHasamend;
                     that.inputId = response.data.data.id;
                 } else {
                     that.$Message.error(response.data.msg);
@@ -58,8 +71,9 @@ export default {
             var that = this;
             this.isSubmitloading = true;
             var obj = {};
-            obj.id = this.inputId
+            obj.id = this.inputId;
             obj.afterMinusorchangeefficiencyHasremovegapmodel = this.afterMinusorchangeefficiencyHasremovegapmodel;
+            obj.afterMinusHasamend = this.afterMinusHasamend;
             this.axios.post(this.seieiURL + "/argumentSetting/update", obj).then((response) => {
                 if (response.data.status == 0) {
                     that.$Message.success({
